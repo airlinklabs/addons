@@ -1,0 +1,1007 @@
+<!--
+############################################################
+File: project.ejs
+Author: g-flame
+Description: project detail/installation page 
+############################################################
+
+CREDITS:
+- Addon developed by g-flame
+- Panel by AirlinkLabs
+- Thanks to all contributors
+
+NOTES:
+- This template is part of the Airlink Addons – Modrinth Store project
+- All EJS template code written by g-flame
+
+############################################################
+-->
+
+<%- include(components.header, { title: title, user: user }) %>
+
+<main class="h-screen m-auto no-scrollbar">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="w-60 h-full">
+      <%- include(components.template) %>
+    </div>
+
+    <!-- Content -->
+    <div class="flex-1 overflow-y-auto pt-16">
+      <!-- Back Navigation -->
+      <div class="px-8 py-4 bg-neutral-900 border-b border-neutral-700">
+        <div class="flex items-center justify-between">
+          <a href="/modrinth" class="inline-flex items-center text-sm text-neutral-400 hover:text-white transition-all group">
+            <svg class="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Store
+          </a>
+
+          <!-- progress -->
+          <button onclick="openProgressModal()" class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+            </svg>
+            Status
+          </button>
+          <%- include('progress') %>
+        </div>
+      </div>
+
+      <!-- Global Admin Warning Banner -->
+      <%
+      const isProjectTypeDisabled = modrinthSettings && modrinthSettings.modrinthInstallationWarning &&
+                                   modrinthSettings.disabledProjectTypes &&
+                                   Array.isArray(modrinthSettings.disabledProjectTypes) &&
+                                   modrinthSettings.disabledProjectTypes.includes(project.project_type);
+      const isProjectBlocked = modrinthSettings && modrinthSettings.blockedProjects &&
+                              Array.isArray(modrinthSettings.blockedProjects) &&
+                              modrinthSettings.blockedProjects.includes(project.id);
+      const isAnyInstallationBlocked = isProjectTypeDisabled || isProjectBlocked;
+      %>
+
+      <% if (isAnyInstallationBlocked) { %>
+      <div class="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-b border-amber-500/20 px-8 py-4">
+        <div class="flex items-start gap-3">
+          <svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+          </svg>
+          <div class="flex-1">
+            <h3 class="font-semibold text-amber-400 mb-1">
+              <%= (modrinthSettings && modrinthSettings.warningTitle) ? modrinthSettings.warningTitle : 'Installation Temporarily Disabled' %>
+            </h3>
+            <p class="text-amber-200 text-sm leading-relaxed mb-3">
+              <%= (modrinthSettings && modrinthSettings.warningMessage) ? modrinthSettings.warningMessage : 'Installations are temporarily disabled due to technical issues in the backend.' %>
+            </p>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <% if (isProjectTypeDisabled) { %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd"></path>
+                </svg>
+                <%= project.project_type.charAt(0).toUpperCase() + project.project_type.slice(1) %> Type Disabled
+              </span>
+              <% } %>
+              <% if (isProjectBlocked) { %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+                Project Blocked
+              </span>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Project Header -->
+      <div class="bg-neutral-900 border-b border-neutral-700 px-8 py-8">
+        <div class="flex items-start gap-6">
+          <!-- Project Icon -->
+          <div class="flex-shrink-0">
+            <% if (project.icon_url) { %>
+            <img src="<%= project.icon_url %>" alt="<%= project.title %>" class="w-24 h-24 rounded-xl border-2 border-neutral-600 shadow-lg" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="w-24 h-24 bg-gradient-to-br from-neutral-700 to-neutral-600 rounded-xl flex items-center justify-center border-2 border-neutral-600 shadow-lg" style="display:none;">
+              <svg class="w-12 h-12 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+              </svg>
+            </div>
+            <% } else { %>
+            <div class="w-24 h-24 bg-gradient-to-br from-neutral-700 to-neutral-600 rounded-xl flex items-center justify-center border-2 border-neutral-600 shadow-lg">
+              <svg class="w-12 h-12 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+              </svg>
+            </div>
+            <% } %>
+          </div>
+
+          <!-- Project Info -->
+          <div class="flex-1 min-w-0">
+            <!-- Title and Badges -->
+            <div class="flex items-center gap-3 mb-3 flex-wrap">
+              <h1 class="text-3xl font-bold text-white truncate"><%= project.title %></h1>
+              <span class="px-3 py-1 text-sm bg-emerald-600 text-white rounded-full font-medium">
+                <%= project.project_type %>
+              </span>
+              <% if (isAnyInstallationBlocked) { %>
+              <span class="px-3 py-1 text-xs bg-red-600/20 text-red-400 rounded-full font-medium border border-red-600/30">
+                Installation Disabled
+              </span>
+              <% } %>
+            </div>
+
+            <!-- Description -->
+            <p class="text-neutral-300 mb-6 text-lg leading-relaxed"><%= project.description %></p>
+
+            <!-- Stats -->
+            <div class="flex items-center gap-6 text-sm text-neutral-400 mb-4">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path>
+                </svg>
+                <span class="font-medium"><%= (project.downloads || 0).toLocaleString() %></span>
+                <span>downloads</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="font-medium"><%= (project.followers || 0).toLocaleString() %></span>
+                <span>followers</span>
+              </div>
+              <div class="text-neutral-500">
+                Updated <%= project.updated ? new Date(project.updated).toLocaleDateString() : 'Unknown' %>
+              </div>
+            </div>
+
+            <!-- Categories -->
+            <% if (project.categories && Array.isArray(project.categories) && project.categories.length > 0) { %>
+            <div class="flex flex-wrap gap-2">
+              <% project.categories.forEach(category => { %>
+              <span class="px-3 py-1 text-xs bg-neutral-700 text-neutral-300 rounded-full border border-neutral-600">
+                <%= category %>
+              </span>
+              <% }); %>
+            </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="px-8 py-6">
+        <div class="flex gap-6">
+          <!-- Description Section -->
+          <div class="flex-1">
+            <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-6">
+              <h2 class="text-xl font-semibold text-white mb-4">Description</h2>
+              <div class="prose prose-invert max-w-none">
+                <% if (project.body) { %>
+                <div id="project-body" class="markdown-content text-neutral-300 leading-relaxed">
+                  <%= project.body %>
+                </div>
+                <% } else { %>
+                <p class="text-neutral-300 leading-relaxed"><%= project.description %></p>
+                <% } %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Versions Sidebar -->
+          <div class="w-80 flex-shrink-0">
+            <div class="space-y-6">
+              <!-- Project Details -->
+              <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-6">
+                <h3 class="text-lg font-semibold text-white mb-4">Project Details</h3>
+                <div class="space-y-3 text-sm">
+                  <% if (project.license && project.license.name) { %>
+                  <div class="flex justify-between items-center">
+                    <span class="text-neutral-400">License</span>
+                    <span class="text-white bg-neutral-700 px-2 py-1 rounded text-xs font-medium"><%= project.license.name %></span>
+                  </div>
+                  <% } %>
+                  <% if (project.client_side) { %>
+                  <div class="flex justify-between items-center">
+                    <span class="text-neutral-400">Client Side</span>
+                    <span class="text-white capitalize bg-neutral-700 px-2 py-1 rounded text-xs font-medium"><%= project.client_side %></span>
+                  </div>
+                  <% } %>
+                  <% if (project.server_side) { %>
+                  <div class="flex justify-between items-center">
+                    <span class="text-neutral-400">Server Side</span>
+                    <span class="text-white capitalize bg-neutral-700 px-2 py-1 rounded text-xs font-medium"><%= project.server_side %></span>
+                  </div>
+                  <% } %>
+                  <% if (project.published) { %>
+                  <div class="flex justify-between items-center">
+                    <span class="text-neutral-400">Published</span>
+                    <span class="text-white text-xs"><%= new Date(project.published).toLocaleDateString() %></span>
+                  </div>
+                  <% } %>
+
+                  <!-- Installation Status -->
+                  <% if (isAnyInstallationBlocked) { %>
+                  <div class="pt-3 border-t border-neutral-700">
+                    <div class="flex justify-between items-center mb-2">
+                      <span class="text-neutral-400">Installation</span>
+                      <span class="text-red-400 text-xs bg-red-600/20 px-2 py-1 rounded border border-red-600/30 font-medium">
+                        Disabled
+                      </span>
+                    </div>
+                    <p class="text-xs text-neutral-500 leading-relaxed">
+                      <% if (isProjectTypeDisabled && isProjectBlocked) { %>
+                      Type disabled & project blocked by admin
+                      <% } else if (isProjectTypeDisabled) { %>
+                      <%= project.project_type.charAt(0).toUpperCase() + project.project_type.slice(1) %> installations disabled by admin
+                      <% } else { %>
+                      This specific project is blocked by admin
+                      <% } %>
+                    </p>
+                  </div>
+                  <% } %>
+                </div>
+
+                <!-- External Links -->
+                <%
+                const hasLinks = (project.source_url || project.issues_url || project.wiki_url || project.discord_url);
+                %>
+                <% if (hasLinks) { %>
+                <div class="mt-6 pt-4 border-t border-neutral-700">
+                  <h4 class="text-sm font-semibold text-white mb-3">External Links</h4>
+                  <div class="space-y-1">
+                    <% if (project.source_url) { %>
+                    <a href="<%= project.source_url %>" target="_blank" rel="noopener noreferrer" class="flex items-center text-sm text-neutral-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-neutral-700">
+                      <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633z" clip-rule="evenodd"></path>
+                      </svg>
+                      Source Code
+                    </a>
+                    <% } %>
+                    <% if (project.issues_url) { %>
+                    <a href="<%= project.issues_url %>" target="_blank" rel="noopener noreferrer" class="flex items-center text-sm text-neutral-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-neutral-700">
+                      <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      Issues
+                    </a>
+                    <% } %>
+                    <% if (project.wiki_url) { %>
+                    <a href="<%= project.wiki_url %>" target="_blank" rel="noopener noreferrer" class="flex items-center text-sm text-neutral-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-neutral-700">
+                      <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253"></path>
+                      </svg>
+                      Wiki
+                    </a>
+                    <% } %>
+                    <% if (project.discord_url) { %>
+                    <a href="<%= project.discord_url %>" target="_blank" rel="noopener noreferrer" class="flex items-center text-sm text-neutral-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-neutral-700">
+                      <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z" />
+                      </svg>
+                      Discord
+                    </a>
+                    <% } %>
+                  </div>
+                </div>
+                <% } %>
+              </div>
+
+              <!-- Versions -->
+              <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-6">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-lg font-semibold text-white">Versions</h3>
+                  <% if (isAnyInstallationBlocked) { %>
+                  <span class="text-xs text-red-400 bg-red-600/20 px-2 py-1 rounded border border-red-600/30 font-medium">
+                    Installs Disabled
+                  </span>
+                  <% } %>
+                </div>
+
+                <% if (versions && Array.isArray(versions) && versions.length > 0) { %>
+                <div class="space-y-3 max-h-96 overflow-y-auto" id="versions-container">
+                  <% versions.slice(0, 5).forEach(version => { %>
+                  <div class="bg-neutral-700 rounded-lg p-4 transition-all border border-neutral-600 <%= isAnyInstallationBlocked ? 'opacity-75' : 'hover:bg-neutral-650' %>" data-version-id="<%= version.id %>">
+                    <div class="flex items-start justify-between mb-3">
+                      <div class="flex-1 min-w-0">
+                        <h4 class="text-white font-medium text-sm mb-1 truncate"><%= version.name %></h4>
+                        <div class="text-xs text-neutral-400">
+                          <span class="text-neutral-400">Version:</span>
+                          <span class="text-white font-mono"><%= version.version_number %></span>
+                        </div>
+                      </div>
+                      <span class="text-xs px-2 py-1 rounded-full bg-emerald-600 text-white font-medium flex-shrink-0">
+                        <%= version.version_type %>
+                      </span>
+                    </div>
+
+                    <!-- Version Details -->
+                    <div class="text-xs text-neutral-400 space-y-1 mb-3">
+                      <% if (version.game_versions && Array.isArray(version.game_versions) && version.game_versions.length > 0) { %>
+                      <div>
+                        <span class="text-neutral-500">Minecraft:</span>
+                        <% version.game_versions.slice(0, 3).forEach((v, index) => { %>
+                        <span class="text-neutral-300 font-mono"><%= v %></span><% if (index < Math.min(2, version.game_versions.length - 1)) { %>, <% } %>
+                        <% }); %>
+                        <% if (version.game_versions.length > 3) { %>
+                        <span class="text-neutral-400">+<%= version.game_versions.length - 3 %> more</span>
+                        <% } %>
+                      </div>
+                      <% } %>
+                      <% if (version.loaders && Array.isArray(version.loaders) && version.loaders.length > 0) { %>
+                      <div class="flex flex-wrap gap-1 mt-2">
+                        <span class="text-neutral-500 mr-1">Loaders:</span>
+                        <% version.loaders.forEach(loader => { %>
+                        <span class="text-neutral-300 font-mono text-xs bg-neutral-600 px-1.5 py-0.5 rounded"><%= loader %></span>
+                        <% }); %>
+                      </div>
+                      <% } %>
+                      <div class="text-neutral-500 mt-2">
+                        <%= version.date_published ? new Date(version.date_published).toLocaleDateString() : 'Unknown date' %>
+                      </div>
+                    </div>
+
+                    <!-- Install Button -->
+                    <% if (!isAnyInstallationBlocked) { %>
+                    <button onclick="installVersion('<%= project.id %>', '<%= version.id %>')" class="w-full px-3 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors font-medium install-button">
+                      Install Version
+                    </button>
+                    <% } else { %>
+                    <div class="w-full px-3 py-2 text-sm bg-neutral-600 text-neutral-400 rounded-lg font-medium text-center cursor-not-allowed relative group">
+                      <span>Installation Disabled</span>
+                      <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-800 text-neutral-300 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
+                        <% if (isProjectTypeDisabled && isProjectBlocked) { %>
+                        Type disabled & project blocked by admin
+                        <% } else if (isProjectTypeDisabled) { %>
+                        <%= project.project_type.charAt(0).toUpperCase() + project.project_type.slice(1) %> installations disabled by admin
+                        <% } else { %>
+                        This project is blocked by admin
+                        <% } %>
+                      </div>
+                    </div>
+                    <% } %>
+                  </div>
+                  <% }); %>
+                </div>
+
+                <% if (versions.length > 5) { %>
+                <button onclick="showAllVersions()" class="w-full mt-4 text-sm text-neutral-400 hover:text-white bg-neutral-700 hover:bg-neutral-600 py-3 rounded-lg transition-colors font-medium">
+                  View All <%= versions.length %> Versions
+                </button>
+                <% } %>
+                <% } else { %>
+                <div class="text-center py-8">
+                  <div class="w-12 h-12 mx-auto mb-3 bg-neutral-700 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7"></path>
+                    </svg>
+                  </div>
+                  <p class="text-neutral-400 text-sm">No versions available</p>
+                </div>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Credits Footer -->
+        <div class="mt-12 pt-6 border-t border-neutral-800">
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <!-- Left: Credits -->
+            <div class="flex items-center gap-2 text-xs text-neutral-500">
+              <span>Modrinth store by</span>
+              <a href="https://github.com/g-flame-oss" target="_blank" class="text-emerald-400 hover:text-emerald-300 transition-colors font-medium">
+                g-flame
+              </a>
+              <span class="text-neutral-700">•</span>
+              <span>Panel by</span>
+              <a href="https://github.com/AirlinkLabs" target="_blank" class="text-emerald-400 hover:text-emerald-300 transition-colors font-medium">
+                AirlinkLabs
+              </a>
+            </div>
+
+            <!-- Right: Links -->
+            <div class="flex items-center gap-3">
+              <a href="https://github.com/g-flame-oss/airlink-addons" target="_blank" class="flex items-center gap-1.5 text-xs text-neutral-400 hover:text-emerald-400 transition-colors group">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path>
+                </svg>
+                <span class="group-hover:underline">GitHub</span>
+              </a>
+              <span class="text-neutral-700">•</span>
+              <a href="https://github.com/g-flame-oss/airlink-addons/blob/modrinth-addon/LICENSE" target="_blank" class="text-xs text-neutral-400 hover:text-emerald-400 transition-colors hover:underline">
+                License
+              </a>
+              <span class="text-neutral-700">•</span>
+              <a href="https://discord.gg/TQzUeg2wJx" target="_blank" class="flex items-center gap-1.5 text-xs text-neutral-400 hover:text-blue-400 transition-colors group">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z"></path>
+                </svg>
+                <span class="group-hover:underline">Discord</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- All Versions Modal -->
+<div id="allVersionsModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+  <div class="bg-neutral-800 rounded-xl border border-neutral-700 w-full max-w-4xl mx-4 max-h-[80vh] overflow-hidden flex flex-col">
+    <!-- Modal Header -->
+    <div class="flex items-center justify-between p-6 border-b border-neutral-700">
+      <h3 class="text-xl font-semibold text-white">All Versions</h3>
+      <button onclick="closeAllVersionsModal()" class="text-neutral-400 hover:text-white transition-colors p-1">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Warning Banner in Modal -->
+    <% if (isAnyInstallationBlocked) { %>
+    <div class="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-b border-amber-500/20 p-4">
+      <div class="flex items-start gap-3">
+        <svg class="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+        </svg>
+        <div>
+          <h4 class="text-amber-400 font-medium text-sm mb-1">
+            <%= (modrinthSettings && modrinthSettings.warningTitle) ? modrinthSettings.warningTitle : 'Installation Temporarily Disabled' %>
+          </h4>
+          <p class="text-amber-200 text-xs leading-relaxed">
+            <%= (modrinthSettings && modrinthSettings.warningMessage) ? modrinthSettings.warningMessage : 'Installations are temporarily disabled due to technical issues in the backend.' %>
+          </p>
+        </div>
+      </div>
+    </div>
+    <% } %>
+
+    <!-- Modal Content -->
+    <div id="allVersionsList" class="p-6 space-y-4 overflow-y-auto flex-1"></div>
+  </div>
+</div>
+
+<!-- Install Modal -->
+<div id="installModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+  <div class="bg-neutral-800 rounded-xl border border-neutral-700 w-full max-w-md mx-4">
+    <!-- Modal Header -->
+    <div class="flex items-center justify-between p-6 border-b border-neutral-700">
+      <h3 class="text-xl font-semibold text-white">Select Server</h3>
+      <button onclick="closeInstallModal()" class="text-neutral-400 hover:text-white transition-colors p-1">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="p-6">
+      <div id="serversList" class="space-y-3 mb-6 max-h-60 overflow-y-auto"></div>
+      <div class="flex justify-end gap-3">
+        <button onclick="closeInstallModal()" class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors font-medium">
+          Cancel
+        </button>
+        <button id="confirmInstall" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors font-medium">
+          Install
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification Container -->
+<div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+<style>
+  /* Hide scrollbar but keep scrollable everywhere */
+  .no-scrollbar {
+    overflow: auto;
+    -ms-overflow-style: none;
+    /* IE & Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
+  }
+
+  /* Optional: prevent horizontal scroll if needed */
+  body,
+  html {
+    overflow-x: hidden;
+  }
+</style>
+
+
+<style>
+  /* Markdown Content Styling */
+  .markdown-content h1,
+  .markdown-content h2,
+  .markdown-content h3,
+  .markdown-content h4 {
+    color: #ffffff;
+    margin-top: 1.5em;
+    margin-bottom: 0.75em;
+    font-weight: 600;
+  }
+
+  .markdown-content h1 {
+    font-size: 1.875rem;
+  }
+
+  .markdown-content h2 {
+    font-size: 1.5rem;
+  }
+
+  .markdown-content h3 {
+    font-size: 1.25rem;
+  }
+
+  .markdown-content h4 {
+    font-size: 1.125rem;
+  }
+
+  .markdown-content p {
+    color: #d1d5db;
+    line-height: 1.6;
+    margin-bottom: 1em;
+  }
+
+  .markdown-content ul,
+  .markdown-content ol {
+    color: #d1d5db;
+    margin-left: 1.5em;
+    margin-bottom: 1em;
+  }
+
+  .markdown-content li {
+    margin-bottom: 0.5em;
+  }
+
+  .markdown-content code {
+    background-color: #374151;
+    color: #fbbf24;
+    padding: 0.125em 0.375em;
+    border-radius: 0.375em;
+    font-size: 0.875em;
+    font-family: 'Courier New', monospace;
+  }
+
+  .markdown-content pre {
+    background-color: #1f2937;
+    color: #d1d5db;
+    padding: 1em;
+    border-radius: 0.5em;
+    overflow-x: auto;
+    margin: 1em 0;
+    border: 1px solid #374151;
+  }
+
+  .markdown-content pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+  }
+
+  .markdown-content a {
+    color: #10b981;
+    text-decoration: underline;
+    transition: color 0.2s;
+  }
+
+  .markdown-content a:hover {
+    color: #059669;
+  }
+
+  .markdown-content blockquote {
+    border-left: 4px solid #374151;
+    padding-left: 1em;
+    margin: 1em 0;
+    color: #9ca3af;
+    font-style: italic;
+  }
+
+  .markdown-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5em;
+    margin: 1em 0;
+    border: 1px solid #374151;
+  }
+
+  .markdown-content video {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5em;
+    margin: 1em 0;
+    border: 1px solid #374151;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #262626;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #404040;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #525252;
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script>
+  // Global variables
+  let allVersions = [];
+  let selectedProject = '';
+  let selectedVersion = '';
+  let selectedServer = null;
+  let isProjectDisabled = false;
+
+  // Initialize page
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('Modrinth Project page loaded');
+
+    // Initialize data from server
+    allVersions = <%- JSON.stringify(Array.isArray(versions) ? versions : []) %>;
+    selectedProject = '<%= project?.id || "" %>';
+    window.projectType = '<%= project?.project_type || "" %>';
+    isProjectDisabled = <%= isAnyInstallationBlocked ? 'true' : 'false' %>;
+
+    // Process Markdown content
+    processProjectDescription();
+  });
+
+  // Process project description markdown
+  function processProjectDescription() {
+    const bodyEl = document.getElementById('project-body');
+    if (!bodyEl || !bodyEl.textContent.trim()) return;
+
+    if (typeof marked !== 'undefined') {
+      const markdownContent = bodyEl.textContent.trim();
+      let html = marked.parse(markdownContent);
+
+      // Handle YouTube video links
+      html = html.replace(
+        /\[Video review\]\((https:\/\/www\.youtube\.com\/watch\?v=[^\)]+)\)/g,
+        function(match, url) {
+          const videoId = new URL(url).searchParams.get('v');
+          return '<div class="aspect-video mb-4"><iframe class="w-full h-full rounded-lg" src="https://www.youtube.com/embed/' + videoId + '" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>';
+        }
+      );
+
+      bodyEl.innerHTML = html;
+    }
+  }
+
+  // Show all versions modal
+  function showAllVersions() {
+    const container = document.getElementById('allVersionsList');
+    container.innerHTML = '';
+
+    if (!allVersions || allVersions.length === 0) {
+      container.innerHTML = '<div class="text-center py-8"><div class="w-16 h-16 mx-auto mb-4 bg-neutral-700 rounded-full flex items-center justify-center"><svg class="w-8 h-8 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7"></path></svg></div><p class="text-neutral-400">No versions available</p></div>';
+      document.getElementById('allVersionsModal').classList.remove('hidden');
+      document.getElementById('allVersionsModal').classList.add('flex');
+      return;
+    }
+
+    // Render all versions
+    allVersions.forEach(function(version) {
+      const versionDiv = document.createElement('div');
+      versionDiv.className = 'bg-neutral-700 rounded-lg p-4 transition-all border border-neutral-600' + (isProjectDisabled ? ' opacity-75' : ' hover:bg-neutral-650');
+
+      const gameVersions = version.game_versions && Array.isArray(version.game_versions) ? version.game_versions : [];
+      const loaders = version.loaders && Array.isArray(version.loaders) ? version.loaders : [];
+
+      let html = '<div class="flex items-start justify-between"><div class="flex-1 min-w-0 pr-4"><div class="flex items-center gap-3 mb-2"><h4 class="text-white font-medium truncate">' + escapeHtml(version.name || 'Unknown Version') + '</h4><span class="text-xs px-2 py-1 rounded-full bg-emerald-600 text-white font-medium flex-shrink-0">' + escapeHtml(version.version_type || 'release') + '</span>';
+
+      if (isProjectDisabled) {
+        html += '<span class="text-xs px-2 py-1 rounded-full bg-red-600/20 text-red-400 border border-red-600/30 font-medium flex-shrink-0">Disabled</span>';
+      }
+
+      html += '</div><div class="text-xs text-neutral-400 space-y-1"><div><span class="text-neutral-500">Version:</span> <span class="text-white font-mono">' + escapeHtml(version.version_number || 'Unknown') + '</span></div>';
+
+      if (gameVersions.length > 0) {
+        html += '<div><span class="text-neutral-500">Minecraft:</span> ' + gameVersions.slice(0, 3).map(function(v) {
+          return '<span class="text-neutral-300 font-mono">' + escapeHtml(v) + '</span>';
+        }).join(', ');
+        if (gameVersions.length > 3) {
+          html += '<span class="text-neutral-400"> +' + (gameVersions.length - 3) + ' more</span>';
+        }
+        html += '</div>';
+      }
+
+      if (loaders.length > 0) {
+        html += '<div class="flex flex-wrap gap-1 items-center mt-2"><span class="text-neutral-500">Loaders:</span>' + loaders.map(function(loader) {
+          return '<span class="text-neutral-300 font-mono text-xs bg-neutral-600 px-1.5 py-0.5 rounded">' + escapeHtml(loader) + '</span>';
+        }).join(' ') + '</div>';
+      }
+
+      html += '<div class="text-neutral-500 mt-2">' + (version.date_published ? new Date(version.date_published).toLocaleDateString() : 'Unknown date') + '</div></div></div><div class="flex-shrink-0">';
+
+      if (!isProjectDisabled) {
+        html += '<button onclick="installVersion(\'' + escapeHtml(selectedProject) + '\', \'' + escapeHtml(version.id) + '\')" class="px-4 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors font-medium">Install</button>';
+      } else {
+        html += '<div class="px-4 py-2 text-sm bg-neutral-600 text-neutral-400 rounded-lg cursor-not-allowed font-medium" title="Installation disabled by administrator">Install Disabled</div>';
+      }
+
+      html += '</div></div>';
+      versionDiv.innerHTML = html;
+      container.appendChild(versionDiv);
+    });
+
+    // Show modal
+    document.getElementById('allVersionsModal').classList.remove('hidden');
+    document.getElementById('allVersionsModal').classList.add('flex');
+  }
+
+  // Close all versions modal
+  function closeAllVersionsModal() {
+    document.getElementById('allVersionsModal').classList.add('hidden');
+    document.getElementById('allVersionsModal').classList.remove('flex');
+  }
+
+  // Install version function
+  function installVersion(projectId, versionId) {
+    if (isProjectDisabled) {
+      showNotification('Installation is currently disabled for this project', 'error');
+      return;
+    }
+
+    if (!projectId || !versionId) {
+      showNotification('Invalid project or version ID', 'error');
+      return;
+    }
+
+    selectedProject = projectId;
+    selectedVersion = versionId;
+
+    // Load servers
+    fetch('/modrinth/api/servers', {
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(function(response) {
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+        }
+        return response.json();
+      })
+      .then(function(data) {
+        if (data.success && data.data && Array.isArray(data.data) && data.data.length > 0) {
+          populateServersList(data.data);
+          closeAllVersionsModal();
+          document.getElementById('installModal').classList.remove('hidden');
+          document.getElementById('installModal').classList.add('flex');
+        } else {
+          showNotification('No servers available for installation', 'error');
+        }
+      })
+      .catch(function(error) {
+        console.error('Error loading servers:', error);
+        showNotification('Failed to load servers. Please try again.', 'error');
+      });
+  }
+
+  // Populate servers list
+  function populateServersList(servers) {
+    const serversList = document.getElementById('serversList');
+    serversList.innerHTML = '';
+
+    servers.forEach(function(server) {
+      const serverDiv = document.createElement('div');
+      serverDiv.className = 'bg-neutral-700 hover:bg-neutral-600 p-4 rounded-lg cursor-pointer transition-all border border-neutral-600';
+      serverDiv.innerHTML = '<div class="flex items-center gap-3"><input type="radio" name="server" value="' + escapeHtml(server.id) + '" class="w-4 h-4 text-emerald-600 bg-neutral-700 border-neutral-500 focus:ring-emerald-500"><div class="flex-1"><div class="text-white font-medium">' + escapeHtml(server.name || 'Unnamed Server') + '</div><div class="text-xs text-neutral-400 mt-1">' + escapeHtml(server.description || 'No description') + '</div><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mt-2 ' + getStatusClass(server.status) + '">' + escapeHtml(server.status || 'unknown') + '</span></div></div>';
+
+      serverDiv.onclick = function() {
+        const radioInput = serverDiv.querySelector('input[type="radio"]');
+        if (radioInput) {
+          radioInput.checked = true;
+          selectedServer = server.id;
+
+          document.querySelectorAll('#serversList > div').forEach(function(div) {
+            div.classList.remove('ring-2', 'ring-emerald-500');
+          });
+          serverDiv.classList.add('ring-2', 'ring-emerald-500');
+        }
+      };
+
+      serversList.appendChild(serverDiv);
+    });
+  }
+
+  // Close install modal
+  function closeInstallModal() {
+    document.getElementById('installModal').classList.add('hidden');
+    document.getElementById('installModal').classList.remove('flex');
+    selectedServer = null;
+  }
+
+  // Get status class for server status
+  function getStatusClass(status) {
+    switch (status) {
+      case 'running':
+        return 'bg-emerald-600 text-white';
+      case 'suspended':
+        return 'bg-red-600 text-white';
+      case 'stopped':
+        return 'bg-neutral-500 text-white';
+      default:
+        return 'bg-neutral-500 text-white';
+    }
+  }
+
+  // HTML escape function
+  function escapeHtml(text) {
+    if (typeof text !== 'string') return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Toast notification system
+  function showNotification(message, type, duration) {
+    type = type || 'info';
+    duration = duration || 5000;
+
+    const toast = document.createElement('div');
+    toast.className = 'bg-neutral-800 border border-neutral-600 rounded-lg shadow-lg p-4 min-w-[320px] max-w-md transition-all transform translate-x-0';
+
+    toast.innerHTML = '<div class="flex items-start gap-3"><div class="flex-shrink-0 mt-0.5">' + getNotificationIcon(type) + '</div><div class="flex-1 min-w-0"><div class="font-medium text-white text-sm">' + getNotificationTitle(type) + '</div><div class="text-neutral-400 text-sm mt-1">' + escapeHtml(message) + '</div></div><button onclick="removeToast(this.parentElement.parentElement)" class="text-neutral-400 hover:text-neutral-200 ml-2 flex-shrink-0"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg></button></div>';
+
+    const container = document.getElementById('toastContainer');
+    container.appendChild(toast);
+
+    if (duration > 0) {
+      setTimeout(function() {
+        removeToast(toast);
+      }, duration);
+    }
+  }
+
+  // Remove toast
+  function removeToast(toast) {
+    if (!toast || !toast.parentElement) return;
+
+    toast.style.transform = 'translateX(100%)';
+    setTimeout(function() {
+      if (toast.parentElement) {
+        toast.parentElement.removeChild(toast);
+      }
+    }, 300);
+  }
+
+  // Get notification icon
+  function getNotificationIcon(type) {
+    switch (type) {
+      case 'error':
+        return '<div class="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center"><svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg></div>';
+      case 'success':
+        return '<div class="w-5 h-5 bg-emerald-600 rounded-full flex items-center justify-center"><svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg></div>';
+      case 'warning':
+        return '<div class="w-5 h-5 bg-amber-600 rounded-full flex items-center justify-center"><svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg></div>';
+      default:
+        return '<div class="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center"><svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg></div>';
+    }
+  }
+
+  // Get notification title
+  function getNotificationTitle(type) {
+    switch (type) {
+      case 'error':
+        return 'Error';
+      case 'success':
+        return 'Success';
+      case 'warning':
+        return 'Warning';
+      default:
+        return 'Info';
+    }
+  }
+
+  // Install confirmation handler
+  document.getElementById('confirmInstall').onclick = function() {
+    if (!selectedServer) {
+      showNotification('Please select a server', 'error');
+      return;
+    }
+
+    const button = this;
+    const originalText = button.textContent;
+    button.textContent = 'Installing...';
+    button.disabled = true;
+    button.classList.add('opacity-75');
+
+    fetch('/modrinth/server/' + encodeURIComponent(selectedServer) + '/install', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          projectId: selectedProject,
+          versionId: selectedVersion
+        })
+      })
+      .then(function(response) {
+        return response.json().then(function(data) {
+          if (response.ok && data.success) {
+            showNotification('Installation started successfully!', 'success');
+            closeInstallModal();
+
+            const installButtons = document.querySelectorAll('.install-button');
+            installButtons.forEach(function(btn) {
+              btn.textContent = 'Installing...';
+              btn.disabled = true;
+              btn.classList.add('opacity-75', 'cursor-not-allowed');
+            });
+
+            setTimeout(function() {
+              installButtons.forEach(function(btn) {
+                btn.textContent = 'Install Version';
+                btn.disabled = false;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+              });
+            }, 5000);
+
+          } else {
+            throw new Error(data.error || 'HTTP ' + response.status + ': Installation failed');
+          }
+        });
+      })
+      .catch(function(error) {
+        console.error('Installation error:', error);
+        showNotification('Installation failed: ' + error.message, 'error');
+      })
+      .finally(function() {
+        button.textContent = originalText;
+        button.disabled = false;
+        button.classList.remove('opacity-75');
+      });
+  };
+
+  // Modal event listeners
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeInstallModal();
+      closeAllVersionsModal();
+    }
+  });
+
+  // Close modals on outside click
+  ['installModal', 'allVersionsModal'].forEach(function(id) {
+    const modal = document.getElementById(id);
+    if (modal) {
+      modal.addEventListener('click', function(e) {
+        if (e.target === this) {
+          if (id === 'installModal') closeInstallModal();
+          else closeAllVersionsModal();
+        }
+      });
+    }
+  });
+
+  console.log('Modrinth Project page loaded successfully');
+</script>
+
+<%- include(components.footer) %>

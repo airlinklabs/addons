@@ -1,0 +1,1135 @@
+<!--
+############################################################
+File: admin-config.ejs
+Author: g-flame
+Description: admin configuration page for Modrinth settings
+############################################################
+
+CREDITS:
+- Addon developed by g-flame
+- Panel by AirlinkLabs
+- Thanks to all contributors
+
+NOTES:
+- This template is part of the Airlink Addons – Modrinth Store project
+- All EJS template code written by g-flame
+
+############################################################
+-->
+
+<%- include(components.header, { title: title, user: user }) %>
+
+<main class="h-screen m-auto no-scrollbar">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="w-60 h-full">
+      <%- include(components.template) %>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-y-auto pt-16 no-scrollbar">
+      <!-- Back Navigation -->
+      <div class="px-8 py-4 bg-neutral-900 border-b border-neutral-700">
+        <div class="flex items-center justify-between">
+          <nav class="flex items-center space-x-2 text-sm">
+            <a href="/modrinth" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
+              Modrinth Store
+            </a>
+            <svg class="w-4 h-4 text-neutral-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-neutral-600 dark:text-neutral-400">Admin Configuration</span>
+          </nav>
+
+          <!-- Credits -->
+          <button onclick="openProgressModal()" class="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white rounded-lg transition-all shadow-lg hover:shadow-xl hover:scale-105">
+            <button onclick="openProgressModal()" class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-all">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+              </svg>
+              Status
+            </button>
+            <%- include('progress') %>
+        </div>
+      </div>
+
+      <div class="px-8 py-6 space-y-6">
+        <!-- File Status Card -->
+        <div class="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-lg font-semibold text-neutral-900 dark:text-white">Configuration File Status</h2>
+              <p class="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+                Settings stored in: <code class="px-2 py-1 bg-neutral-100 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded text-xs font-mono">modrinth-settings.json</code>
+              </p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="refreshFileStatus()" class="inline-flex items-center px-3 py-1.5 text-sm bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-md hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-colors">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Refresh
+              </button>
+              <button onclick="loadCurrentSettings()" class="inline-flex items-center px-3 py-1.5 text-sm bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 rounded-md hover:bg-emerald-200 dark:hover:bg-emerald-800 transition-colors">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Reload Settings
+              </button>
+            </div>
+          </div>
+
+          <div id="fileStatus" class="flex items-center space-x-2 p-3 bg-neutral-50 dark:bg-neutral-700 rounded-lg">
+            <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+            <span class="text-sm text-neutral-600 dark:text-neutral-400">Loading file status...</span>
+          </div>
+        </div>
+
+        <!-- Easy Configuration UI -->
+        <div class="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700">
+          <div class="px-6 py-4 border-b border-neutral-200 dark:border-neutral-700">
+            <h2 class="text-lg font-semibold text-neutral-900 dark:text-white">Easy Configuration</h2>
+            <p class="text-sm text-neutral-600 dark:text-neutral-400 mt-1">Manage your Modrinth settings with an intuitive interface</p>
+          </div>
+
+          <div class="p-6 space-y-6">
+            <!-- Warning Settings -->
+            <div class="space-y-4">
+              <h3 class="font-medium text-neutral-900 dark:text-white">Installation Warning</h3>
+
+              <div class="flex items-center space-x-3">
+                <input type="checkbox" id="enableWarning" class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-neutral-300 dark:border-neutral-600 rounded">
+                <label for="enableWarning" class="text-sm text-neutral-700 dark:text-neutral-300">
+                  Show installation warning to users
+                </label>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div>
+                  <label for="warningTitle" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                    Warning Title
+                  </label>
+                  <input type="text" id="warningTitle" class="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Installation Temporarily Disabled">
+                </div>
+                <div>
+                  <label for="warningMessage" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                    Warning Message
+                  </label>
+                  <textarea id="warningMessage" rows="3" class="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Installations are temporarily disabled..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Disabled Project Types -->
+            <div class="space-y-4">
+              <h3 class="font-medium text-neutral-900 dark:text-white">Disabled Project Types</h3>
+              <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                Select project types to completely hide from browse results
+              </p>
+
+              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3" id="projectTypeButtons">
+                <!-- Project type buttons will be inserted here -->
+              </div>
+            </div>
+
+            <!-- Blocked Projects -->
+            <div class="space-y-4">
+              <h3 class="font-medium text-neutral-900 dark:text-white">Blocked Projects</h3>
+              <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                Add specific project IDs to show as disabled but keep visible
+              </p>
+
+              <div class="flex gap-2">
+                <input type="text" id="newProjectId" class="flex-1 px-3 py-2 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Enter project ID (e.g., fabric-api, optifine)">
+                <button onclick="addBlockedProject()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md transition-colors font-medium">
+                  <svg class="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                  </svg>
+                  Add
+                </button>
+              </div>
+
+              <!-- Blocked projects list -->
+              <div id="blockedProjectsList" class="space-y-2">
+                <!-- Blocked projects will be listed here -->
+              </div>
+            </div>
+
+            <!-- Apply Changes Button -->
+            <div class="pt-4 border-t border-neutral-200 dark:border-neutral-700">
+              <button onclick="applyEasySettings()" class="inline-flex items-center px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors font-medium shadow-sm">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v6a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                </svg>
+                Apply Changes to JSON
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Configuration Editor Card -->
+        <div class="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700">
+          <!-- Editor Header -->
+          <div class="px-6 py-4 border-b border-neutral-200 dark:border-neutral-700">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-lg font-semibold text-neutral-900 dark:text-white">JSON Configuration Editor</h2>
+                <p class="text-sm text-neutral-600 dark:text-neutral-400 mt-1">Edit the configuration directly. Changes are validated before saving.</p>
+              </div>
+
+              <!-- Editor Actions -->
+              <div class="flex items-center gap-2">
+                <button onclick="formatJson()" class="inline-flex items-center px-3 py-1.5 text-sm bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-md hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                  </svg>
+                  Format
+                </button>
+                <button onclick="validateJson()" class="inline-flex items-center px-3 py-1.5 text-sm bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-md hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  Validate
+                </button>
+                <button onclick="resetToDefaults()" class="inline-flex items-center px-3 py-1.5 text-sm bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 rounded-md hover:bg-amber-200 dark:hover:bg-amber-800 transition-colors">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                  </svg>
+                  Reset
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- JSON Editor -->
+          <div class="p-6">
+            <div class="relative">
+              <div class="absolute top-3 left-3 text-xs text-neutral-500 dark:text-neutral-400 font-mono z-10 select-none">
+                JSON Configuration
+              </div>
+
+              <textarea id="jsonEditor" class="w-full h-96 px-4 py-8 bg-neutral-50 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 rounded-lg text-neutral-900 dark:text-neutral-100 font-mono text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-none" spellcheck="false" placeholder="Loading configuration..."></textarea>
+
+              <!-- Editor Status Bar -->
+              <div class="flex items-center justify-between mt-3 text-xs">
+                <div id="editorStatus" class="flex items-center space-x-4 text-neutral-500 dark:text-neutral-400">
+                  <span id="jsonValid" class="hidden flex items-center text-emerald-600 dark:text-emerald-400">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    Valid JSON
+                  </span>
+                  <span id="jsonInvalid" class="hidden flex items-center text-red-600 dark:text-red-400">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                    </svg>
+                    Invalid JSON
+                  </span>
+                  <span id="characterCount">0 characters</span>
+                </div>
+                <div class="flex items-center space-x-3 text-neutral-400 dark:text-neutral-500">
+                  <span>Ctrl+S: Save</span>
+                  <span>•</span>
+                  <span>Ctrl+Enter: Format</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Template and Save Actions -->
+          <div class="px-6 py-4 bg-neutral-50 dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-700 rounded-b-lg">
+            <div class="flex items-center justify-between">
+              <div class="flex gap-3">
+                <button onclick="loadTemplate('restrictive')" class="inline-flex items-center px-4 py-2 bg-white dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-600 transition-colors">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                  </svg>
+                  Load Restrictive Template
+                </button>
+                <button onclick="loadTemplate('permissive')" class="inline-flex items-center px-4 py-2 bg-white dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-600 transition-colors">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+                  </svg>
+                  Load Permissive Template
+                </button>
+              </div>
+
+              <button onclick="saveSettings()" class="inline-flex items-center px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors font-medium shadow-sm">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v6a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                </svg>
+                Save Configuration
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Documentation Card -->
+        <div class="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 p-6">
+          <h2 class="text-lg font-semibold text-neutral-900 dark:text-white mb-4">Configuration Reference</h2>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Settings Structure -->
+            <div>
+              <h3 class="font-medium text-neutral-900 dark:text-white mb-3">Settings Structure</h3>
+              <div class="bg-neutral-50 dark:bg-neutral-900 rounded-lg p-4 border border-neutral-200 dark:border-neutral-700">
+                <pre class="text-sm text-neutral-700 dark:text-neutral-300 font-mono overflow-x-auto"><code>{
+  "modrinthInstallationWarning": false,
+  "warningTitle": "Installation Disabled",
+  "warningMessage": "Installations disabled.",
+  "disabledProjectTypes": ["mod", "shader"],
+  "blockedProjects": ["fabric-api", "optifine"]
+}</code></pre>
+              </div>
+            </div>
+
+            <!-- Project Types -->
+            <div>
+              <h3 class="font-medium text-neutral-900 dark:text-white mb-3">Available Project Types</h3>
+              <div class="space-y-2">
+                <% 
+                const projectTypes = [
+                  { type: 'mod', desc: 'Client/server modifications', icon: '🔧' },
+                  { type: 'modpack', desc: 'Collections of mods', icon: '📦' },
+                  { type: 'resourcepack', desc: 'Texture and sound packs', icon: '🎨' },
+                  { type: 'shader', desc: 'Graphics enhancements', icon: '✨' },
+                  { type: 'datapack', desc: 'Game mechanics mods', icon: '📊' },
+                  { type: 'plugin', desc: 'Server plugins', icon: '🔌' }
+                ];
+                
+                projectTypes.forEach(item => {
+                %>
+                <div class="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-700">
+                  <div class="flex items-center gap-3">
+                    <span class="text-lg"><%= item.icon %></span>
+                    <div>
+                      <code class="text-sm font-mono bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded">
+                        <%= item.type %>
+                      </code>
+                    </div>
+                  </div>
+                  <span class="text-sm text-neutral-600 dark:text-neutral-400"><%= item.desc %></span>
+                </div>
+                <% }); %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Configuration Tips -->
+          <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700/50 rounded-lg">
+            <div class="flex items-start gap-3">
+              <div class="w-5 h-5 bg-blue-100 dark:bg-blue-800/50 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-3 h-3 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div class="flex-1">
+                <h4 class="font-medium text-blue-900 dark:text-blue-200 mb-2">Configuration Tips</h4>
+                <ul class="text-sm text-blue-800 dark:text-blue-300 space-y-1">
+                  <li><strong>disabledProjectTypes:</strong> Completely hide project types from browse results</li>
+                  <li><strong>blockedProjects:</strong> Show specific projects as disabled but keep them visible</li>
+                  <li><strong>Project IDs:</strong> Found in Modrinth URLs (e.g., modrinth.com/mod/fabric-api → "fabric-api")</li>
+                  <li><strong>Warning display:</strong> Only shown when modrinthInstallationWarning is set to true</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistics Card (Commented out as mentioned in original) -->
+        <!--
+        <div class="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 p-6">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="text-lg font-semibold text-neutral-900 dark:text-white">Installation Statistics</h2>
+              <p class="text-sm text-neutral-600 dark:text-neutral-400 mt-1">Overview of Modrinth installations and filtering activity</p>
+            </div>
+            <button onclick="refreshStatistics()" 
+                    class="inline-flex items-center px-3 py-1.5 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              Refresh
+            </button>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20 p-6 rounded-lg border border-emerald-200 dark:border-emerald-700">
+              <div class="flex items-center justify-between mb-2">
+                <div class="text-2xl font-bold text-emerald-700 dark:text-emerald-400" id="totalInstallations">
+                  <div class="animate-pulse bg-emerald-200 dark:bg-emerald-700 h-8 w-16 rounded"></div>
+                </div>
+                <div class="w-10 h-10 bg-emerald-200 dark:bg-emerald-800 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="text-sm text-emerald-700 dark:text-emerald-400 font-medium">Total Installations</div>
+              <div class="text-xs text-emerald-600 dark:text-emerald-500 mt-1">Successful downloads</div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-6 rounded-lg border border-blue-200 dark:border-blue-700">
+              <div class="flex items-center justify-between mb-2">
+                <div class="text-2xl font-bold text-blue-700 dark:text-blue-400" id="activeProjects">
+                  <div class="animate-pulse bg-blue-200 dark:bg-blue-700 h-8 w-16 rounded"></div>
+                </div>
+                <div class="w-10 h-10 bg-blue-200 dark:bg-blue-800 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="text-sm text-blue-700 dark:text-blue-400 font-medium">Active Projects</div>
+              <div class="text-xs text-blue-600 dark:text-blue-500 mt-1">Unique installations</div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 p-6 rounded-lg border border-amber-200 dark:border-amber-700">
+              <div class="flex items-center justify-between mb-2">
+                <div class="text-2xl font-bold text-amber-700 dark:text-amber-400" id="blockedInstallations">
+                  <div class="animate-pulse bg-amber-200 dark:bg-amber-700 h-8 w-16 rounded"></div>
+                </div>
+                <div class="w-10 h-10 bg-amber-200 dark:bg-amber-800 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="text-sm text-amber-700 dark:text-amber-400 font-medium">Blocked Attempts</div>
+              <div class="text-xs text-amber-600 dark:text-amber-500 mt-1">Failed/restricted installs</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Credits Footer -->
+        <div class="mt-12 pt-6 border-t border-neutral-800">
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <!-- Left: Credits -->
+            <div class="flex items-center gap-2 text-xs text-neutral-500">
+              <span>Modrinth store by</span>
+              <a href="https://github.com/g-flame-oss" target="_blank" class="text-emerald-400 hover:text-emerald-300 transition-colors font-medium">
+                g-flame
+              </a>
+              <span class="text-neutral-700">•</span>
+              <span>Panel by</span>
+              <a href="https://github.com/AirlinkLabs" target="_blank" class="text-emerald-400 hover:text-emerald-300 transition-colors font-medium">
+                AirlinkLabs
+              </a>
+            </div>
+
+            <!-- Right: Links -->
+            <div class="flex items-center gap-3">
+              <a href="https://github.com/g-flame-oss/airlink-addons" target="_blank" class="flex items-center gap-1.5 text-xs text-neutral-400 hover:text-emerald-400 transition-colors group">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path>
+                </svg>
+                <span class="group-hover:underline">GitHub</span>
+              </a>
+              <span class="text-neutral-700">•</span>
+              <a href="https://github.com/g-flame-oss/airlink-addons/blob/modrinth-addon/LICENSE" target="_blank" class="text-xs text-neutral-400 hover:text-emerald-400 transition-colors hover:underline">
+                License
+              </a>
+              <span class="text-neutral-700">•</span>
+              <a href="https://discord.gg/TQzUeg2wJx" target="_blank" class="flex items-center gap-1.5 text-xs text-neutral-400 hover:text-blue-400 transition-colors group">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z"></path>
+                </svg>
+                <span class="group-hover:underline">Discord</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Success/Error Notifications -->
+<div id="notification" class="fixed top-4 right-4 z-50 hidden transform transition-all duration-300">
+  <div class="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-lg p-4 min-w-[320px] max-w-md">
+    <div class="flex items-start gap-3">
+      <div id="notificationIcon" class="flex-shrink-0 mt-0.5"></div>
+      <div class="flex-1 min-w-0">
+        <div id="notificationTitle" class="font-medium text-neutral-900 dark:text-white text-sm"></div>
+        <div id="notificationMessage" class="text-neutral-600 dark:text-neutral-400 text-sm mt-1"></div>
+      </div>
+      <button onclick="hideNotification()" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 ml-2">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Hide scrollbar but keep scrollable everywhere */
+  .no-scrollbar {
+    overflow: auto;
+    -ms-overflow-style: none;
+    /* IE & Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
+  }
+
+  /* Optional: prevent horizontal scroll if needed */
+  body,
+  html {
+    overflow-x: hidden;
+  }
+</style>
+
+<script>
+  // Global variables
+  let currentSettings = <%- JSON.stringify(modrinthSettings || {}) %>;
+  let editorContent = '';
+
+  // Project types configuration (JavaScript version for frontend)
+  const projectTypesJS = [{
+      type: 'mod',
+      desc: 'Mods',
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="24" viewBox="0 0 32 32"><title>Model-builder SVG Icon</title><path fill="#000005" d="M22 4v3H10V4H2v8h8V9h7.023A4.946 4.946 0 0 0 16 12v8a3.004 3.004 0 0 1-3 3h-3v-3H2v8h8v-3h3a5.006 5.006 0 0 0 5-5v-8a2.998 2.998 0 0 1 2.997-3H22v3h8V4ZM8 10H4V6h4Zm0 16H4v-4h4Zm20-16h-4V6h4Z"/></svg>',
+      color: 'emerald'
+    },
+    {
+      type: 'modpack',
+      desc: 'Modpacks',
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><title>Package SVG Icon</title><path fill="#000005" d="M21.993 7.95a.96.96 0 0 0-.029-.214c-.007-.025-.021-.049-.03-.074c-.021-.057-.04-.113-.07-.165c-.016-.027-.038-.049-.057-.075c-.032-.045-.063-.091-.102-.13c-.023-.022-.053-.04-.078-.061c-.039-.032-.075-.067-.12-.094c-.004-.003-.009-.003-.014-.006l-.008-.006l-8.979-4.99a1.002 1.002 0 0 0-.97-.001l-9.021 4.99c-.003.003-.006.007-.011.01l-.01.004c-.035.02-.061.049-.094.073c-.036.027-.074.051-.106.082c-.03.031-.053.067-.079.102c-.027.035-.057.066-.079.104c-.026.043-.04.092-.059.139c-.014.033-.032.064-.041.1a.975.975 0 0 0-.029.21c-.001.017-.007.032-.007.05V16c0 .363.197.698.515.874l8.978 4.987l.001.001l.002.001l.02.011c.043.024.09.037.135.054c.032.013.063.03.097.039a1.013 1.013 0 0 0 .506 0c.033-.009.064-.026.097-.039c.045-.017.092-.029.135-.054l.02-.011l.002-.001l.001-.001l8.978-4.987c.316-.176.513-.511.513-.874V7.998c0-.017-.006-.031-.007-.048m-10.021 3.922L5.058 8.005L7.82 6.477l6.834 3.905zm.048-7.719L18.941 8l-2.244 1.247l-6.83-3.903zM13 19.301l.002-5.679L16 11.944V15l2-1v-3.175l2-1.119v5.705z"/></svg>',
+      color: 'blue'
+    },
+    {
+      type: 'resourcepack',
+      desc: 'Resource Packs',
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 36 36"><title>Resource-pool-solid-badged SVG Icon</title><path fill="#000005" d="M8.57 30.9A16 16 0 0 0 33.95 19H18.43Z" class="clr-i-solid--badged clr-i-solid-path-1--badged"/><path fill="#000005" d="M33.95 17a15.91 15.91 0 0 0-.84-4.18a7.49 7.49 0 0 1-9.92-9.94A16 16 0 0 0 7 29.6L17.49 17Z" class="clr-i-solid--badged clr-i-solid-path-2--badged"/><circle cx="30" cy="6" r="5" fill="#000005" class="clr-i-solid--badged clr-i-solid-path-3--badged clr-i-badge"/><path fill="none" d="M0 0h36v36H0z"/></svg>',
+      color: 'purple'
+    },
+    {
+      type: 'shader',
+      desc: 'Shaders',
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"><title>Shadow SVG Icon</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M24 2.5A21.477 21.477 0 0 0 3.583 30.712a10.22 10.22 0 1 1 13.705 13.705A21.496 21.496 0 1 0 24 2.5"/></svg>',
+      color: 'yellow'
+    },
+    {
+      type: 'datapack',
+      desc: 'Data Packs',
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 1024 1024"><title>Branches-outlined SVG Icon</title><path fill="#000005" d="M740 161c-61.8 0-112 50.2-112 112c0 50.1 33.1 92.6 78.5 106.9v95.9L320 602.4V318.1c44.2-15 76-56.9 76-106.1c0-61.8-50.2-112-112-112s-112 50.2-112 112c0 49.2 31.8 91 76 106.1V706c-44.2 15-76 56.9-76 106.1c0 61.8 50.2 112 112 112s112-50.2 112-112c0-49.2-31.8-91-76-106.1v-27.8l423.5-138.7a50.52 50.52 0 0 0 34.9-48.2V378.2c42.9-15.8 73.6-57 73.6-105.2c0-61.8-50.2-112-112-112m-504 51a48.01 48.01 0 0 1 96 0a48.01 48.01 0 0 1-96 0m96 600a48.01 48.01 0 0 1-96 0a48.01 48.01 0 0 1 96 0m408-491a48.01 48.01 0 0 1 0-96a48.01 48.01 0 0 1 0 96"/></svg>',
+      color: 'indigo'
+    },
+    {
+      type: 'plugin',
+      desc: 'Plugins',
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"><title>Game-plugins SVG Icon</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M17.517 14.46a4.903 4.903 0 1 1 5.555.048M8.14 25.647a4.903 4.903 0 1 1-.24 5.55"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M17.517 14.46c.33.614.266 1.66-1.29 1.846h-9.65v8.24a1.071 1.071 0 0 0 1.563 1.1m-.239 5.55a.95.95 0 0 0-1.324 1.087v7.93h20.5"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="m18.806 34.453l2.552 4.44c3.068-1.814 6.202.008 6.202 3.567h5.097c0-3.559 2.838-5.214 6.216-3.559l2.553-4.45c-3.149-1.807-3.151-5.338 0-7.15l-2.553-4.437c-3.035 1.802-6.216.004-6.216-3.572H27.56c0 3.576-3.133 5.374-6.204 3.576l-2.55 4.353c3.228 1.89 3.04 5.485 0 7.232"/><circle cx="30.116" cy="30.876" r="4.168" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M23.072 14.508c-.468.376-.58 1.608 1.186 1.798h8.399v2.986"/></svg>',
+      color: 'red'
+    }
+  ];
+
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('Modrinth Admin Config loaded');
+
+    loadCurrentSettings();
+    refreshFileStatus();
+    loadStatistics();
+    setupJsonEditor();
+    setupProjectTypeButtons();
+    setupEasyUI();
+  });
+
+  function setupEasyUI() {
+    // Setup enter key handler for project ID input
+    const projectInput = document.getElementById('newProjectId');
+    if (projectInput) {
+      projectInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          addBlockedProject();
+        }
+      });
+    }
+  }
+
+  function setupProjectTypeButtons() {
+    const container = document.getElementById('projectTypeButtons');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    projectTypesJS.forEach(project => {
+      const button = document.createElement('button');
+      button.className = `project-type-btn flex flex-col items-center p-3 rounded-lg border-2 transition-all hover:shadow-md ${getProjectTypeButtonClass(project.type, false)}`;
+      button.setAttribute('data-type', project.type);
+      button.onclick = () => toggleProjectType(project.type);
+
+      button.innerHTML = `
+      <span class="text-2xl mb-1">${project.icon}</span>
+      <span class="text-xs font-medium text-center">${project.desc}</span>
+    `;
+
+      container.appendChild(button);
+    });
+  }
+
+  function getProjectTypeButtonClass(type, isDisabled) {
+    const project = projectTypesJS.find(p => p.type === type);
+    if (!project) return '';
+
+    if (isDisabled) {
+      return `bg-red-100 dark:bg-red-900/30 border-red-300 dark:border-red-700 text-red-700 dark:text-red-300`;
+    } else {
+      return `bg-neutral-50 dark:bg-neutral-700 border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-600`;
+    }
+  }
+
+  function toggleProjectType(type) {
+    try {
+      const settings = JSON.parse(document.getElementById('jsonEditor').value);
+
+      if (!Array.isArray(settings.disabledProjectTypes)) {
+        settings.disabledProjectTypes = [];
+      }
+
+      const index = settings.disabledProjectTypes.indexOf(type);
+      if (index > -1) {
+        settings.disabledProjectTypes.splice(index, 1);
+      } else {
+        settings.disabledProjectTypes.push(type);
+      }
+
+      updateJsonEditor(settings);
+      updateProjectTypeButtons();
+      showNotification('Updated', `${type} toggled in disabled project types`, 'success');
+    } catch (error) {
+      console.error('Error toggling project type:', error);
+      showNotification('Error', 'Failed to toggle project type', 'error');
+    }
+  }
+
+  function updateProjectTypeButtons() {
+    try {
+      const settings = JSON.parse(document.getElementById('jsonEditor').value);
+      const disabledTypes = settings.disabledProjectTypes || [];
+
+      document.querySelectorAll('.project-type-btn').forEach(button => {
+        const type = button.getAttribute('data-type');
+        const isDisabled = disabledTypes.includes(type);
+        button.className = `project-type-btn flex flex-col items-center p-3 rounded-lg border-2 transition-all hover:shadow-md ${getProjectTypeButtonClass(type, isDisabled)}`;
+      });
+    } catch (error) {
+      console.error('Error updating project type buttons:', error);
+    }
+  }
+
+  function addBlockedProject() {
+    const input = document.getElementById('newProjectId');
+    if (!input) return;
+
+    const projectId = input.value.trim();
+    if (!projectId) {
+      showNotification('Error', 'Please enter a project ID', 'error');
+      return;
+    }
+
+    try {
+      const settings = JSON.parse(document.getElementById('jsonEditor').value);
+
+      if (!Array.isArray(settings.blockedProjects)) {
+        settings.blockedProjects = [];
+      }
+
+      if (settings.blockedProjects.includes(projectId)) {
+        showNotification('Warning', 'Project ID already blocked', 'warning');
+        return;
+      }
+
+      settings.blockedProjects.push(projectId);
+      updateJsonEditor(settings);
+      updateBlockedProjectsList();
+      input.value = '';
+      showNotification('Added', `Project "${projectId}" added to blocked list`, 'success');
+    } catch (error) {
+      console.error('Error adding blocked project:', error);
+      showNotification('Error', 'Failed to add blocked project', 'error');
+    }
+  }
+
+  function removeBlockedProject(projectId) {
+    try {
+      const settings = JSON.parse(document.getElementById('jsonEditor').value);
+
+      if (!Array.isArray(settings.blockedProjects)) {
+        settings.blockedProjects = [];
+      }
+
+      const index = settings.blockedProjects.indexOf(projectId);
+      if (index > -1) {
+        settings.blockedProjects.splice(index, 1);
+        updateJsonEditor(settings);
+        updateBlockedProjectsList();
+        showNotification('Removed', `Project "${projectId}" removed from blocked list`, 'success');
+      }
+    } catch (error) {
+      console.error('Error removing blocked project:', error);
+      showNotification('Error', 'Failed to remove blocked project', 'error');
+    }
+  }
+
+  function updateBlockedProjectsList() {
+    const container = document.getElementById('blockedProjectsList');
+    if (!container) return;
+
+    try {
+      const settings = JSON.parse(document.getElementById('jsonEditor').value);
+      const blockedProjects = settings.blockedProjects || [];
+
+      if (blockedProjects.length === 0) {
+        container.innerHTML = '<p class="text-sm text-neutral-500 dark:text-neutral-400 italic">No blocked projects</p>';
+        return;
+      }
+
+      container.innerHTML = blockedProjects.map(projectId => `
+      <div class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"></path>
+          </svg>
+          <code class="text-sm font-mono text-red-700 dark:text-red-300">${projectId}</code>
+        </div>
+        <button onclick="removeBlockedProject('${projectId}')" 
+                class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+        </button>
+      </div>
+    `).join('');
+    } catch (error) {
+      console.error('Error updating blocked projects list:', error);
+      container.innerHTML = '<p class="text-sm text-red-500">Error loading blocked projects</p>';
+    }
+  }
+
+  function applyEasySettings() {
+    try {
+      const enableWarning = document.getElementById('enableWarning').checked;
+      const warningTitle = document.getElementById('warningTitle').value.trim();
+      const warningMessage = document.getElementById('warningMessage').value.trim();
+
+      const settings = JSON.parse(document.getElementById('jsonEditor').value);
+
+      settings.modrinthInstallationWarning = enableWarning;
+      settings.warningTitle = warningTitle || "Installation Temporarily Disabled";
+      settings.warningMessage = warningMessage || "Installations are temporarily disabled due to technical issues in the backend.";
+
+      updateJsonEditor(settings);
+      showNotification('Applied', 'Easy settings applied to JSON configuration', 'success');
+    } catch (error) {
+      console.error('Error applying easy settings:', error);
+      showNotification('Error', 'Failed to apply easy settings', 'error');
+    }
+  }
+
+  function updateJsonEditor(settings) {
+    const editor = document.getElementById('jsonEditor');
+    if (editor) {
+      editor.value = JSON.stringify(settings, null, 2);
+      editorContent = editor.value;
+      document.getElementById('characterCount').textContent = `${editor.value.length} characters`;
+      validateJsonSyntax();
+    }
+  }
+
+  function syncEasyUIFromJSON() {
+    try {
+      const settings = JSON.parse(document.getElementById('jsonEditor').value);
+
+      // Update warning settings
+      const enableWarning = document.getElementById('enableWarning');
+      const warningTitle = document.getElementById('warningTitle');
+      const warningMessage = document.getElementById('warningMessage');
+
+      if (enableWarning) enableWarning.checked = settings.modrinthInstallationWarning || false;
+      if (warningTitle) warningTitle.value = settings.warningTitle || '';
+      if (warningMessage) warningMessage.value = settings.warningMessage || '';
+
+      // Update project type buttons
+      updateProjectTypeButtons();
+
+      // Update blocked projects list
+      updateBlockedProjectsList();
+    } catch (error) {
+      console.error('Error syncing easy UI from JSON:', error);
+    }
+  }
+
+  function setupJsonEditor() {
+    const editor = document.getElementById('jsonEditor');
+    const characterCount = document.getElementById('characterCount');
+
+    if (!editor) return;
+
+    editor.addEventListener('input', function() {
+      editorContent = editor.value;
+      if (characterCount) {
+        characterCount.textContent = `${editor.value.length} characters`;
+      }
+      validateJsonSyntax();
+
+      // Sync easy UI when JSON is manually changed
+      setTimeout(() => {
+        syncEasyUIFromJSON();
+      }, 100);
+    });
+
+    // Keyboard shortcuts
+    editor.addEventListener('keydown', function(e) {
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case 's':
+            e.preventDefault();
+            saveSettings();
+            break;
+          case 'Enter':
+            e.preventDefault();
+            formatJson();
+            break;
+        }
+      }
+    });
+  }
+
+  function validateJsonSyntax() {
+    const editor = document.getElementById('jsonEditor');
+    const validIndicator = document.getElementById('jsonValid');
+    const invalidIndicator = document.getElementById('jsonInvalid');
+
+    if (!editor || !validIndicator || !invalidIndicator) return;
+
+    try {
+      JSON.parse(editor.value);
+      validIndicator.classList.remove('hidden');
+      invalidIndicator.classList.add('hidden');
+      editor.classList.remove('border-red-300', 'dark:border-red-600');
+      editor.classList.add('border-neutral-300', 'dark:border-neutral-600');
+      return true;
+    } catch (error) {
+      validIndicator.classList.add('hidden');
+      invalidIndicator.classList.remove('hidden');
+      invalidIndicator.textContent = `Invalid JSON: ${error.message}`;
+      editor.classList.add('border-red-300', 'dark:border-red-600');
+      editor.classList.remove('border-neutral-300', 'dark:border-neutral-600');
+      return false;
+    }
+  }
+
+  async function loadCurrentSettings() {
+    try {
+      const response = await fetch('/modrinth/api/settings', {
+        credentials: 'include'
+      });
+      const settings = await response.json();
+
+      const editor = document.getElementById('jsonEditor');
+      if (editor) {
+        editor.value = JSON.stringify(settings, null, 2);
+        editorContent = editor.value;
+        document.getElementById('characterCount').textContent = `${editor.value.length} characters`;
+        validateJsonSyntax();
+      }
+
+      currentSettings = settings;
+      syncEasyUIFromJSON();
+      console.log('Loaded current settings:', settings);
+    } catch (error) {
+      console.error('Error loading settings:', error);
+      showNotification('Error', 'Failed to load current settings', 'error');
+    }
+  }
+
+  function formatJson() {
+    const editor = document.getElementById('jsonEditor');
+    if (!editor) return;
+
+    try {
+      const parsed = JSON.parse(editor.value);
+      editor.value = JSON.stringify(parsed, null, 2);
+      editorContent = editor.value;
+      document.getElementById('characterCount').textContent = `${editor.value.length} characters`;
+      validateJsonSyntax();
+      syncEasyUIFromJSON();
+      showNotification('Success', 'JSON formatted successfully', 'success');
+    } catch (error) {
+      showNotification('Error', `Cannot format invalid JSON: ${error.message}`, 'error');
+    }
+  }
+
+  function validateJson() {
+    const editor = document.getElementById('jsonEditor');
+    if (!editor) return;
+
+    try {
+      const parsed = JSON.parse(editor.value);
+      const errors = [];
+
+      // Validate structure
+      if (typeof parsed.modrinthInstallationWarning !== 'boolean') {
+        errors.push('modrinthInstallationWarning must be a boolean');
+      }
+
+      if (typeof parsed.warningTitle !== 'string') {
+        errors.push('warningTitle must be a string');
+      }
+
+      if (typeof parsed.warningMessage !== 'string') {
+        errors.push('warningMessage must be a string');
+      }
+
+      if (!Array.isArray(parsed.disabledProjectTypes)) {
+        errors.push('disabledProjectTypes must be an array');
+      } else {
+        parsed.disabledProjectTypes.forEach((type, index) => {
+          if (typeof type !== 'string') {
+            errors.push(`disabledProjectTypes[${index}] must be a string`);
+          }
+        });
+      }
+
+      if (!Array.isArray(parsed.blockedProjects)) {
+        errors.push('blockedProjects must be an array');
+      } else {
+        parsed.blockedProjects.forEach((project, index) => {
+          if (typeof project !== 'string') {
+            errors.push(`blockedProjects[${index}] must be a string`);
+          }
+        });
+      }
+
+      if (errors.length === 0) {
+        showNotification('Valid Configuration', 'JSON structure and types are correct', 'success');
+        return true;
+      } else {
+        showNotification('Validation Errors', errors.join('; '), 'error');
+        return false;
+      }
+    } catch (error) {
+      showNotification('JSON Syntax Error', error.message, 'error');
+      return false;
+    }
+  }
+
+  function resetToDefaults() {
+    if (confirm('Reset configuration to defaults? This will clear all current settings.')) {
+      const defaultSettings = {
+        "modrinthInstallationWarning": false,
+        "warningTitle": "Installation Temporarily Disabled",
+        "warningMessage": "Installations are temporarily disabled due to technical issues in the backend.",
+        "disabledProjectTypes": [],
+        "blockedProjects": []
+      };
+
+      updateJsonEditor(defaultSettings);
+      syncEasyUIFromJSON();
+      showNotification('Reset Complete', 'Configuration reset to defaults', 'success');
+    }
+  }
+
+  function loadTemplate(type) {
+    let template;
+
+    if (type === 'restrictive') {
+      template = {
+        "modrinthInstallationWarning": false,
+        "warningTitle": "Restricted Installation Mode",
+        "warningMessage": "Only modpacks and resource packs are currently allowed for installation. Mods and shaders are temporarily disabled.",
+        "disabledProjectTypes": ["mod", "shader", "plugin"],
+        "blockedProjects": ["optifine", "fabric-api", "create"]
+      };
+    } else if (type === 'permissive') {
+      template = {
+        "modrinthInstallationWarning": false,
+        "warningTitle": "Installation Temporarily Disabled",
+        "warningMessage": "Installations are temporarily disabled due to technical issues in the backend.",
+        "disabledProjectTypes": [],
+        "blockedProjects": []
+      };
+    }
+
+    if (template) {
+      updateJsonEditor(template);
+      syncEasyUIFromJSON();
+      showNotification('Template Loaded', `${type.charAt(0).toUpperCase() + type.slice(1)} template loaded`, 'success');
+    }
+  }
+
+  async function saveSettings() {
+    const editor = document.getElementById('jsonEditor');
+    if (!editor) return;
+
+    if (!validateJsonSyntax()) {
+      showNotification('Invalid JSON', 'Please fix JSON syntax errors before saving', 'error');
+      return;
+    }
+
+    if (!validateJson()) {
+      return;
+    }
+
+    try {
+      const settings = JSON.parse(editor.value);
+
+      const response = await fetch('/modrinth/admin/config', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(settings),
+        credentials: 'include'
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        currentSettings = result.settings || settings;
+        showNotification('Configuration Saved', 'Settings have been saved successfully', 'success');
+
+        setTimeout(() => {
+          refreshFileStatus();
+          refreshStatistics();
+        }, 500);
+      } else {
+        showNotification('Save Failed', result.error || 'Failed to save configuration', 'error');
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      showNotification('Network Error', 'Failed to communicate with server. Please try again.', 'error');
+    }
+  }
+
+  async function refreshFileStatus() {
+    try {
+      const response = await fetch('/modrinth/api/file-status', {
+        credentials: 'include'
+      });
+      const result = await response.json();
+
+      const statusEl = document.getElementById('fileStatus');
+      if (!statusEl) return;
+
+      if (result.success && result.data.exists) {
+        const lastModified = new Date(result.data.lastModified).toLocaleString();
+        statusEl.innerHTML = `
+        <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
+        <span class="text-sm text-neutral-600 dark:text-neutral-400">File exists • ${result.data.size} bytes • Modified: ${lastModified}</span>
+      `;
+      } else {
+        statusEl.innerHTML = `
+        <div class="w-2 h-2 bg-amber-500 rounded-full"></div>
+        <span class="text-sm text-amber-600 dark:text-amber-400">File not found (will be created on save)</span>
+      `;
+      }
+    } catch (error) {
+      console.error('File status error:', error);
+      const statusEl = document.getElementById('fileStatus');
+      if (statusEl) {
+        statusEl.innerHTML = `
+        <div class="w-2 h-2 bg-red-500 rounded-full"></div>
+        <span class="text-sm text-red-600 dark:text-red-400">Error retrieving file status</span>
+      `;
+      }
+    }
+  }
+
+  async function loadStatistics() {
+    try {
+      const response = await fetch('/modrinth/api/statistics', {
+        credentials: 'include'
+      });
+      const stats = await response.json();
+
+      if (stats.success) {
+        const totalEl = document.getElementById('totalInstallations');
+        const activeEl = document.getElementById('activeProjects');
+        const blockedEl = document.getElementById('blockedInstallations');
+
+        if (totalEl) totalEl.textContent = stats.data.totalInstallations || 0;
+        if (activeEl) activeEl.textContent = stats.data.activeProjects || 0;
+        if (blockedEl) blockedEl.textContent = stats.data.blockedInstallations || 0;
+      }
+    } catch (error) {
+      console.error('Statistics error:', error);
+    }
+  }
+
+  function refreshStatistics() {
+    loadStatistics();
+  }
+
+  function showNotification(title, message, type = 'success') {
+    const notification = document.getElementById('notification');
+    const titleEl = document.getElementById('notificationTitle');
+    const messageEl = document.getElementById('notificationMessage');
+    const iconEl = document.getElementById('notificationIcon');
+
+    if (!notification || !titleEl || !messageEl || !iconEl) return;
+
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+
+    let iconHtml = '';
+    switch (type) {
+      case 'success':
+        iconHtml = '<div class="w-5 h-5 bg-emerald-100 dark:bg-emerald-900 rounded-full flex items-center justify-center"><svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg></div>';
+        break;
+      case 'error':
+        iconHtml = '<div class="w-5 h-5 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center"><svg class="w-3 h-3 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg></div>';
+        break;
+      case 'warning':
+        iconHtml = '<div class="w-5 h-5 bg-amber-100 dark:bg-amber-900 rounded-full flex items-center justify-center"><svg class="w-3 h-3 text-amber-600 dark:text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg></div>';
+        break;
+      default:
+        iconHtml = '<div class="w-5 h-5 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center"><svg class="w-3 h-3 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg></div>';
+    }
+
+    iconEl.innerHTML = iconHtml;
+    notification.classList.remove('hidden', 'translate-x-full');
+    notification.classList.add('translate-x-0');
+
+    setTimeout(() => {
+      if (notification && !notification.classList.contains('hidden')) {
+        hideNotification();
+      }
+    }, 5000);
+  }
+
+  function hideNotification() {
+    const notification = document.getElementById('notification');
+    if (notification) {
+      notification.classList.add('translate-x-full');
+      notification.classList.remove('translate-x-0');
+      setTimeout(() => {
+        notification.classList.add('hidden');
+        notification.classList.remove('translate-x-full');
+      }, 300);
+    }
+  }
+
+  // Debug helper
+  window.modrinthJsonEditor = {
+    currentSettings,
+    loadCurrentSettings,
+    saveSettings,
+    validateJson,
+    formatJson,
+    refreshFileStatus,
+    loadStatistics,
+    toggleProjectType,
+    addBlockedProject,
+    removeBlockedProject
+  };
+
+  console.log('Modrinth JSON Editor loaded successfully');
+</script>
+
+<%- include(components.footer) %>
