@@ -1,24 +1,20 @@
 {
-    "name": "Modrinth Store",
-    "version": "1.6.23",
-    "description": "Browse, search, and install Minecraft mods and modpacks from Modrinth directly inside your AirLink admin panel.",
-    "longDescription": "The Modrinth Store addon integrates Modrinth directly into your AirLink panel. Browse, search, and install mods or modpacks from the admin panel with full feature control, progress bars, and a clean UI.",
+    "name": "parachute",
+    "version": "1.0.0",
+    "description": "Parachute is an AirLink Panel addon that integrates with Google Drive for server backups and file management. It handles authentication, token storage, and server-specific operations using server UUIDs..",
+    "longDescription": "Parachute is an AirLink Panel addon that integrates with Google Drive for server backups and file management. It handles authentication, token storage, and server-specific operations using server UUIDs.",
     "author": "g-flame",
     "status": "working",
     "tags": [
-        "Minecraft",
-        "Mods",
-        "Modrinth API"
+        "Backup",
+        "Cloud",
+        "Google drive"
     ],
     "icon": "https://raw.githubusercontent.com/modrinth/knossos/refs/heads/master/assets/images/logo.svg",
     "iconType": "url",
     "features": [
-        "Browse and search the Modrinth mod database",
-        "One-click mod and modpack installation",
-        "Progress bars for download feedback",
-        "Admin panel integration with sidebar entry",
-        "Full Modrinth API support"
+        "Safely backup to cloud"
     ],
-    "github": "https://github.com/g-flame-oss/airlink-addons/tree/modrinth-addon",
+    "github": "https://github.com/g-flame-oss/airlink-addons/tree/parachute",
     "screenshots": []
 }
