@@ -1,34 +1,11 @@
 {
-    "note": "After restarting the panel, the Modrinth Store will appear in your AirLink admin panel sidebar.",
-    "steps": [
-        {
-            "title": "Move the zip to the addons folder",
-            "commands": [
-                "cd /var/www/panel/storage/addons/",
-                "mkdir modrinth-store",
-                "mv modrinth-store.zip modrinth-store/"
-            ]
-        },
-        {
-            "title": "Extract the zip",
-            "commands": [
-                "cd /var/www/panel/storage/addons/modrinth-store",
-                "unzip modrinth-store.zip"
-            ]
-        },
-        {
-            "title": "Install dependencies and build",
-            "commands": [
-                "cd /var/www/panel/storage/addons/modrinth-store",
-                "sudo npm install",
-                "sudo npm run build"
-            ]
-        },
-        {
-            "title": "Restart AirLink panel",
-            "commands": [
-                "systemctl restart airlink-panel"
-            ]
-        }
-    ]
+  "name": "Modrinth Store",
+  "author": "AirLinkLab",
+  "repo": "https://github.com/airlinklabs/modrinth-store",
+  "branch": "main",
+  "note": "Restart the panel after installation.",
+  "commands": {
+    "1": "npm install",
+    "2": "npm run build"
+  }
 }
