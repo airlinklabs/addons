@@ -1,8 +1,8 @@
 {
   "name": "Modrinth Store",
   "author": "AirLinkLab",
-  "repo": "https://github.com/airlinklabs/modrinth-store",
-  "branch": "main",
+  "repo": "https://github.com/g-flame-oss/airlink-addons",
+  "branch": "modrinth-addon",
   "note": "Restart the panel after installation.",
   "commands": {
     "1": "npm install",
