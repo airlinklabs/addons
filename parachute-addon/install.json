@@ -1,8 +1,8 @@
 {
-  "name": "Modrinth Store",
+  "name": "Parachute",
   "author": "AirLinkLab",
   "repo": "https://github.com/g-flame-oss/airlink-addons",
-  "branch": "modrinth-addon",
+  "branch": "parachute",
   "note": "Restart the panel after installation.",
   "commands": {
     "1": "npm install",
