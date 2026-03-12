@@ -1,130 +1,113 @@
-# AirLink Addon Registry — Specification
+<div align="center"> 
+  <h1>Parachute Addon for AirLink Panel</h1>
+</div>
 
-The `airlinklabs/addons` repository is the central registry for community addons.
-Each top-level folder is one addon. The folder name is the **unique addon ID** and must be lowercase with hyphens (e.g. `modrinth-store`, `parachute`).
+Parachute is an AirLink Panel addon that integrates with Google Drive for server backups and file management. It handles authentication, token storage, and server-specific operations using server UUIDs.
+
+<div align="center">
+
+| Dashboard                                                                                                | Server Selection                                                                                         | Info Screen (without encryption)                                                                         |
+| -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| <img src="https://github.com/user-attachments/assets/52faabd4-62e9-474d-9602-14fa3aec49dd" width="400"/> | <img src="https://github.com/user-attachments/assets/338a245e-f37a-41e1-afbc-c78dad743222" width="400"/> | <img src="https://github.com/user-attachments/assets/32176e79-1ec4-42ae-bd32-fc9f9df77c1c" width="400"/> |
+
+| Info Screen (with encryption)                                                                            | Dashboard after backup created                                                                           | Delete                                                                                                   |
+| -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| <img src="https://github.com/user-attachments/assets/ef296a09-a9d3-4556-905f-940331541330" width="400"/> | <img src="https://github.com/user-attachments/assets/fb391479-7257-4d65-b3aa-7ae9e7a320e4" width="400"/> | <img src="https://github.com/user-attachments/assets/24f792dc-a832-4689-ac2f-d25e63a8cf68" width="400"/> |
+
+| Dashboard before logging in to Google                                                                    | Progress screen                                                                                                  |
+| -------------------------------------------------------------------------------------------------------- |------------------------------------------------------------------------------------------------------------------|
+| <img src="https://github.com/user-attachments/assets/b8cfaf9d-3526-44cc-9c58-d243e5e1f0f5" width="400"/> |<img width="400" alt="image" src="https://github.com/user-attachments/assets/46793ec8-5a43-4091-a30a-98919ae1f6f3" />|
+
+
+</div>
 
 ---
 
-## Folder Structure
+## Features
+
+* Connect your server to Google Drive via OAuth and upload download and restore server backup files.
+
+## Installation
+
+### Option 1: Download Release
+
+1. **Download the latest release** from [HERE](#get-it-here).
+2. **Move the release to your Airlink addons folder:**
 
 ```
-airlinklabs/addons/
-├── modrinth-store/
-│   ├── info.json    ← required: metadata, icon, tags, features
-│   └── install.json    ← required: install steps & commands
-│
-├── parachute/
-│   ├── info.json
-│   └── install.json
-│
-└── your-addon/
-    ├── info.json
-    └── install.json
+/var/www/panel/storage/addons/
 ```
 
----
+3. **Run the following commands:**
 
-## `info.json` Schema
-
-```json
-{
-  "name": "Display Name",
-  "version": "1.0.0",
-  "description": "Short one-line description shown on cards.",
-  "longDescription": "Longer paragraph shown in the detail popup. Optional — falls back to description.",
-  "author": "your-github-username",
-  "status": "working",
-  "tags": ["Minecraft", "Backups"],
-  "icon": "https://example.com/icon.svg",
-  "iconType": "url",
-  "features": [
-    "Feature one",
-    "Feature two"
-  ],
-  "github": "https://github.com/you/your-addon-repo",
-  "screenshots": [],
-  "installNote": "Optional tip shown below install steps."
-}
+```bash
+cd /var/www/panel/storage/addons/
+mkdir parachute
+mv parachute.zip parachute/
+cd parachute
+unzip parachute.zip
+cd /var/www/panel/storage/addons/parachute
+sudo npm install
+sudo npm run build
 ```
 
-### Field Reference
+4. **Start your Airlink panel.**
+   The Parachute Addon will now be available in your panel.
+.
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | ✅ | Display name |
-| `version` | string | ✅ | Semver e.g. `1.2.3` |
-| `description` | string | ✅ | Short description (1–2 sentences) |
-| `longDescription` | string | — | Longer description for detail popup |
-| `author` | string | ✅ | GitHub username or display name |
-| `status` | `"working"` \| `"beta"` \| `"wip"` | — | Default: `"working"` |
-| `tags` | string[] | — | Filter tags e.g. `["Minecraft", "API"]` |
-| `icon` | string | — | URL to an SVG, PNG, or WEBP icon |
-| `iconType` | `"url"` \| `"svg"` | — | `"url"` = img src, `"svg"` = inline svg string. Default: `"url"` |
-| `features` | string[] | — | Bullet points shown in the detail popup |
-| `github` | string | — | Link to your addon's source repo |
-| `screenshots` | string[] | — | Array of direct image URLs |
-| `installNote` | string | — | Warning/tip shown after install steps |
+### Option 2: Clone Repository
 
----
+1. **Clone the repository directly:**
 
-## `install.json` Schema
-
-```json
-{
-  "note": "Optional note shown at the bottom of install steps.",
-  "steps": [
-    {
-      "title": "Clone the addon",
-      "commands": [
-        "cd /var/www/panel/storage/addons/",
-        "git clone https://github.com/you/your-addon.git your-addon"
-      ]
-    },
-    {
-      "title": "Install dependencies",
-      "commands": [
-        "cd /var/www/panel/storage/addons/your-addon",
-        "npm install",
-        "npm run build"
-      ]
-    },
-    {
-      "title": "Restart AirLink panel",
-      "commands": [
-        "systemctl restart airlink-panel"
-      ]
-    }
-  ]
-}
+```bash
+cd /var/www/panel/storage/addons/
+git clone --branch parachute https://github.com/g-flame-oss/airlink-addons.git parachute
 ```
 
-### Field Reference
+2. **Install dependencies and build:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `note` | string | — | Warning/note shown below all steps |
-| `steps` | Step[] | ✅ | Ordered list of install steps |
-| `steps[].title` | string | ✅ | Step heading |
-| `steps[].commands` | string[] | ✅ | Shell commands to run |
+```bash
+cd /var/www/panel/storage/addons/parachute
+npm install
+npm run build
+```
 
----
-
-## How the Registry Works
-
-1. The GitHub Actions workflow in `airlinklabs/panel-docs` runs every 6 hours
-2. It fetches the `airlinklabs/addons` repo contents via the GitHub API
-3. For each folder, it reads `info.json` and `install.json`
-4. It builds a single `public/api-cache/addons-registry.json` file
-5. That file is committed and served statically — the site reads it at load time
-
-This means your addon appears within 6 hours of being merged (or on the next manual workflow run).
+3. **Start your Airlink panel.**
+   The Parachute Addon will now be available in your panel.
 
 ---
 
-## Submitting Your Addon
+## Get It Here
 
-1. Fork `airlinklabs/addons`
-2. Create a folder: `your-addon-id/` (unique, lowercase, hyphens only)
-3. Add `info.json` and `install.json` following the schemas above
-4. Open a Pull Request
-5. Once merged, the registry auto-updates ✅
+* [SourceXchange – Download and instructions](https://www.sourcexchange.net/products/parachute-for-airlink)
+* [GitHub releases page](https://github.com/g-flame-oss/airlink-addons/releases)
+* [Built by bit ](https://builtbybit.com/resources/parachute-for-airlink.79073/)
+
+---
+
+## Configuration
+
+Set the following environment variables in your panel environment:
+
+```bash
+APP_URL=https://yourpanel.com
+GOOGLE_CLIENT_ID=your_google_app_key
+GOOGLE_CLIENT_SECRET=your_google_app_secret
+```
+
+* `APP_URL` → Base URL of your AirLink panel.
+* `GOOGLE_CLIENT_ID` → OAuth client ID from the Google Developer Console.
+* `GOOGLE_CLIENT_SECRET` → OAuth client secret from the Google Developer Console.
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## Credits
+
+* Addon developed by [g-flame](https://github.com/g-flame-oss)
+* Panel by [AirlinkLabs](https://github.com/airlinklabs)

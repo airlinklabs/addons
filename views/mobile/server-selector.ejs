@@ -1,0 +1,33 @@
+<div id="serverSelectorModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end justify-center">
+  <div class="bg-[#111] border-t border-neutral-800 rounded-t-2xl w-full max-w-lg max-h-[80vh] flex flex-col">
+    <div class="w-10 h-1 bg-neutral-700 rounded-full mx-auto mt-3"></div>
+    <div class="flex items-center justify-between px-5 py-4 border-b border-neutral-800 flex-shrink-0">
+      <h2 class="text-sm font-semibold text-white" id="serverSelectorTitle">Select server</h2>
+      <button onclick="hideModal('serverSelectorModal')" class="text-neutral-600 p-1">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <p class="text-xs text-neutral-600 px-5 pt-2" id="serverSelectorDesc"></p>
+    <div class="px-4 py-3 flex-shrink-0">
+      <input type="text" id="serverSearch" placeholder="Search…" onkeyup="filterServers()"
+        class="w-full px-3 py-2.5 bg-neutral-800 border border-neutral-700 rounded-xl text-sm text-white placeholder-neutral-600 focus:outline-none">
+    </div>
+    <div class="px-4 pb-6 overflow-y-auto flex-1 space-y-2.5" id="serversList">
+      <div class="flex items-center justify-center py-8">
+        <div class="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function filterServers() {
+  const q = document.getElementById('serverSearch').value.toLowerCase();
+  document.querySelectorAll('#serversList > div[onclick]').forEach(el => {
+    const name = el.querySelector('p')?.textContent?.toLowerCase() ?? '';
+    el.style.display = name.includes(q) ? '' : 'none';
+  });
+}
+</script>

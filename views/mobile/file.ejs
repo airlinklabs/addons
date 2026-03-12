@@ -1,0 +1,21 @@
+<div class="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
+  <div class="flex items-center justify-between px-4 py-3.5 border-b border-neutral-800">
+    <div>
+      <h2 class="text-sm font-semibold text-white">Backups</h2>
+      <p class="text-xs text-neutral-600">Stored in Google Drive</p>
+    </div>
+    <button onclick="initiateCreate()"
+      class="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-medium transition-colors">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+      </svg>
+      New
+    </button>
+  </div>
+
+  <div id="backupsList" class="min-h-[80px]">
+    <div class="flex items-center justify-center py-8">
+      <div class="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  </div>
+</div>

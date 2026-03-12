@@ -1,0 +1,52 @@
+<div id="restoreBackupModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end justify-center">
+  <div class="bg-[#111] border-t border-neutral-800 rounded-t-2xl w-full max-w-lg max-h-[90vh] flex flex-col">
+    <div class="w-10 h-1 bg-neutral-700 rounded-full mx-auto mt-3 flex-shrink-0"></div>
+    <div class="flex items-center justify-between px-5 py-4 border-b border-neutral-800 flex-shrink-0">
+      <h2 class="text-sm font-semibold text-white">Restore backup</h2>
+      <button onclick="hideModal('restoreBackupModal')" class="text-neutral-600 p-1">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="p-5 overflow-y-auto flex-1 space-y-4">
+      <div id="restorePasswordGroup" class="hidden">
+        <label class="block text-xs font-medium text-neutral-400 mb-1.5">Password <span class="text-red-400">*</span></label>
+        <input type="password" id="restorePassword" placeholder="Backup password"
+          class="w-full px-3.5 py-3 bg-neutral-800 border border-neutral-700 rounded-xl text-sm text-white placeholder-neutral-600 focus:outline-none">
+        <p class="text-xs text-amber-400/70 mt-1.5">This backup is encrypted</p>
+      </div>
+      <div class="bg-red-500/5 border border-red-500/15 rounded-xl p-3.5 space-y-1">
+        <p class="text-xs font-medium text-red-400">All current server files will be deleted</p>
+        <p class="text-xs text-neutral-600">Cannot be undone.</p>
+      </div>
+      <label class="flex items-start gap-3 cursor-pointer">
+        <input type="checkbox" id="confirmRestore" class="mt-0.5 w-4 h-4 rounded bg-neutral-800 border-neutral-700 text-emerald-600">
+        <span class="text-xs text-neutral-400 leading-relaxed">I understand this overwrites current server files</span>
+      </label>
+    </div>
+    <div class="flex gap-3 px-5 py-4 pb-8 border-t border-neutral-800 flex-shrink-0">
+      <button onclick="hideModal('restoreBackupModal')" class="flex-1 py-3 text-sm text-neutral-400 bg-neutral-800 rounded-xl">Cancel</button>
+      <button onclick="handleRestoreBackup()" class="flex-1 py-3 text-sm text-white bg-emerald-600 rounded-xl font-medium">Restore</button>
+    </div>
+  </div>
+</div>
+
+<script>
+async function handleRestoreBackup() {
+  if (!document.getElementById('confirmRestore').checked) { showToast('Please confirm you understand the risks', 'error'); return; }
+  const pwGroup = document.getElementById('restorePasswordGroup');
+  const password = !pwGroup.classList.contains('hidden') ? document.getElementById('restorePassword').value : undefined;
+  if (!pwGroup.classList.contains('hidden') && !password) { showToast('Password required', 'error'); return; }
+  hideModal('restoreBackupModal');
+  showToast('Restore started', 'info', 0);
+  try {
+    const { success, error } = await fetch(`/parachute/api/backup/${currentBackupId}/restore`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ serverUUID: currentServerUUID, password }),
+    }).then(r => r.json());
+    if (success) { showToast('Backup restored', 'success'); document.getElementById('confirmRestore').checked = false; }
+    else showToast(error || 'Failed to restore', 'error', 8000);
+  } catch { showToast('Network error', 'error', 8000); }
+}
+</script>

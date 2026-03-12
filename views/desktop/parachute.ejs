@@ -1,0 +1,422 @@
+<%- include(components.header, { title: title, user: user }) %>
+
+<main class="h-screen flex">
+  <div class="w-60 h-full flex-shrink-0">
+    <%- include(components.template) %>
+  </div>
+
+  <div class="flex-1 flex flex-col overflow-hidden pt-16">
+    <div class="flex-1 overflow-y-auto no-scrollbar">
+      <div class="max-w-5xl mx-auto px-8 py-8">
+
+        <div class="flex items-end justify-between mb-7">
+          <div>
+            <h1 class="text-2xl font-semibold text-white tracking-tight">Parachute</h1>
+            <p class="text-sm text-neutral-500 mt-1">Backup and restore servers to Google Drive</p>
+          </div>
+          <button onclick="openProgressModal()"
+            class="flex items-center gap-2 px-3.5 py-2 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 text-neutral-300 hover:text-white rounded-lg text-sm transition-all">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            Progress
+          </button>
+        </div>
+
+        <div class="mb-6">
+          <%- include(components.google) %>
+        </div>
+
+        <div id="statsRow" class="hidden grid grid-cols-3 gap-4 mb-6">
+          <div class="bg-neutral-900 border border-neutral-800 rounded-lg px-5 py-4">
+            <p class="text-xs text-neutral-500 uppercase tracking-wide mb-1">Backups</p>
+            <p class="text-2xl font-semibold text-white" id="statTotal">0</p>
+          </div>
+          <div class="bg-neutral-900 border border-neutral-800 rounded-lg px-5 py-4">
+            <p class="text-xs text-neutral-500 uppercase tracking-wide mb-1">Total size</p>
+            <p class="text-2xl font-semibold text-white" id="statSize">—</p>
+          </div>
+          <div class="bg-neutral-900 border border-neutral-800 rounded-lg px-5 py-4">
+            <p class="text-xs text-neutral-500 uppercase tracking-wide mb-1">Encrypted</p>
+            <p class="text-2xl font-semibold text-white" id="statEncrypted">0</p>
+          </div>
+        </div>
+
+        <%- include(components.fileList) %>
+
+        <div class="mt-10 pt-5 border-t border-neutral-900 flex items-center justify-between">
+          <div class="flex items-center gap-1.5 text-xs text-neutral-600">
+            <span>Parachute by</span>
+            <a href="https://github.com/g-flame-oss" target="_blank" class="text-neutral-400 hover:text-white transition-colors">g-flame</a>
+            <span>·</span>
+            <span>Panel by</span>
+            <a href="https://github.com/AirlinkLabs" target="_blank" class="text-neutral-400 hover:text-white transition-colors">AirlinkLabs</a>
+          </div>
+          <div class="flex items-center gap-3 text-xs">
+            <a href="https://github.com/g-flame-oss/airlink-addons" target="_blank" class="text-neutral-600 hover:text-neutral-400 transition-colors">GitHub</a>
+            <span class="text-neutral-800">·</span>
+            <a href="https://discord.gg/TQzUeg2wJx" target="_blank" class="text-neutral-600 hover:text-neutral-400 transition-colors">Discord</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Progress modal -->
+<div id="progressModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  <div class="bg-[#111] border border-neutral-800 rounded-xl w-full max-w-md relative">
+    <button onclick="closeProgressModal()" class="absolute top-4 right-4 text-neutral-500 hover:text-white transition-colors">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+    <div class="p-6 border-b border-neutral-800">
+      <h3 class="text-base font-semibold text-white">Operation progress</h3>
+      <p class="text-xs text-neutral-500 mt-0.5">Updates every 5 seconds</p>
+    </div>
+    <div class="p-6">
+      <div id="progressEmpty" class="text-center py-6">
+        <p class="text-sm text-neutral-500">No operations running</p>
+      </div>
+      <div id="progressActive" class="hidden">
+        <p id="progressMsg" class="text-sm text-white font-medium mb-4">Preparing...</p>
+        <div class="bg-neutral-800 rounded-full h-2 mb-2 overflow-hidden">
+          <div id="progressBar" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width:0%"></div>
+        </div>
+        <div class="flex justify-between items-center mb-5">
+          <span id="progressPct" class="text-xs text-emerald-400 font-medium">0%</span>
+          <span class="text-xs text-neutral-600">may take several minutes</span>
+        </div>
+        <div id="stepsList" class="space-y-2.5"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include(components.serverSelector) %>
+<%- include(components.createBackupModal) %>
+<%- include(components.restoreBackupModal) %>
+<%- include(components.renameBackupModal) %>
+<%- include(components.deleteConfirmModal) %>
+<%- include(components.toast) %>
+
+<script>
+let currentBackupId = null;
+let currentServerUUID = null;
+let backupsData = [];
+
+// ─── Modal helpers ───────────────────────────────────────────────
+
+function showModal(id) {
+  document.getElementById(id).classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function hideModal(id) {
+  document.getElementById(id).classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+// ─── Auth status ─────────────────────────────────────────────────
+
+async function updateAuthStatus() {
+  try {
+    const { success, data } = await fetch('/parachute/api/status').then(r => r.json());
+    const connected = success && data?.connected;
+    document.getElementById('googleConnected').classList.toggle('hidden', !connected);
+    document.getElementById('googleDisconnected').classList.toggle('hidden', connected);
+    document.getElementById('statsRow').classList.toggle('hidden', !connected);
+    if (connected) {
+      if (data.pictureUrl) document.getElementById('googlePicture').src = data.pictureUrl;
+      document.getElementById('googleName').textContent = data.displayName || 'Connected';
+      document.getElementById('googleEmail').textContent = data.email || '';
+      document.getElementById('googleFolder').textContent = data.folderName || '';
+    }
+  } catch (err) {
+    console.error('Auth status error:', err);
+  }
+}
+
+// ─── Backups ──────────────────────────────────────────────────────
+
+async function loadBackups() {
+  try {
+    const { success, data } = await fetch('/parachute/api/backups').then(r => r.json());
+    if (success) {
+      backupsData = data;
+      renderBackups(data);
+      updateStats(data);
+    }
+  } catch (err) {
+    console.error('Load backups error:', err);
+    showToast('Failed to load backups', 'error');
+  }
+}
+
+function updateStats(backups) {
+  document.getElementById('statTotal').textContent = backups.length;
+  document.getElementById('statSize').textContent = formatBytes(backups.reduce((n, b) => n + (b.fileSize || 0), 0));
+  document.getElementById('statEncrypted').textContent = backups.filter(b => b.encrypted === 1).length;
+}
+
+function escapeHtml(text) {
+  const el = document.createElement('div');
+  el.textContent = text;
+  return el.innerHTML;
+}
+
+function formatBytes(bytes) {
+  if (!bytes) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`;
+}
+
+function renderBackups(list) {
+  const el = document.getElementById('backupsList');
+  if (!list.length) {
+    el.innerHTML = `<div class="text-center py-16">
+      <svg class="w-12 h-12 text-neutral-700 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+      </svg>
+      <p class="text-sm text-neutral-500">No backups yet</p>
+      <p class="text-xs text-neutral-600 mt-1">Connect Google Drive and create your first backup</p>
+    </div>`;
+    return;
+  }
+  el.innerHTML = list.map(b => `
+    <div class="backup-item flex items-center justify-between px-5 py-4 bg-neutral-900 border border-neutral-800 rounded-lg hover:border-neutral-700 transition-colors" data-id="${b.id}">
+      <div class="flex-1 min-w-0 mr-4">
+        <div class="flex items-center gap-2.5 mb-1">
+          <span class="text-sm font-medium text-white truncate">${escapeHtml(b.backupName)}</span>
+          ${b.encrypted ? '<span class="flex-shrink-0 text-xs px-1.5 py-0.5 bg-amber-500/10 text-amber-400 rounded border border-amber-500/20">encrypted</span>' : ''}
+        </div>
+        <div class="flex items-center gap-4 text-xs text-neutral-500">
+          <span>${new Date(b.createdAt).toLocaleString()}</span>
+          ${b.fileSize ? `<span>${formatBytes(b.fileSize)}</span>` : ''}
+          <span class="font-mono">${b.serverUUID.substring(0, 8)}…</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <button onclick="initiateRename(${b.id})" title="Rename"
+          class="p-2 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+        </button>
+        <button onclick="initiateRestore(${b.id})" title="Restore"
+          class="px-3 py-1.5 text-xs bg-emerald-600/10 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-600/20 hover:border-emerald-600 rounded-lg transition-all">
+          Restore
+        </button>
+        <button onclick="initiateDelete(${b.id})" title="Delete"
+          class="p-2 text-neutral-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── Initiate actions ─────────────────────────────────────────────
+
+function initiateCreate() {
+  document.getElementById('serverSelectorTitle').textContent = 'Select server to back up';
+  document.getElementById('serverSelectorDesc').textContent = 'Choose which server to create a backup of';
+  showModal('serverSelectorModal');
+  loadServers('create');
+}
+
+function initiateRestore(id) {
+  currentBackupId = id;
+  document.getElementById('serverSelectorTitle').textContent = 'Select restore target';
+  document.getElementById('serverSelectorDesc').textContent = 'Choose which server to restore this backup to';
+  showModal('serverSelectorModal');
+  loadServers('restore');
+}
+
+function initiateRename(id) {
+  currentBackupId = id;
+  const b = backupsData.find(x => x.id === id);
+  if (b) { document.getElementById('renameInput').value = b.backupName; showModal('renameBackupModal'); }
+}
+
+function initiateDelete(id) {
+  currentBackupId = id;
+  const b = backupsData.find(x => x.id === id);
+  if (b) { document.getElementById('deleteBackupName').textContent = b.backupName; showModal('deleteConfirmModal'); }
+}
+
+// ─── Servers ──────────────────────────────────────────────────────
+
+async function loadServers(action) {
+  try {
+    const { success, data } = await fetch('/parachute/api/servers').then(r => r.json());
+    if (success) renderServers(data, action);
+  } catch (err) {
+    console.error('Load servers error:', err);
+    showToast('Failed to load servers', 'error');
+  }
+}
+
+function renderServers(servers, action) {
+  const el = document.getElementById('serversList');
+  if (!servers.length) {
+    el.innerHTML = '<div class="text-center py-10"><p class="text-sm text-neutral-500">No servers available</p></div>';
+    return;
+  }
+  el.innerHTML = servers.map(s => {
+    const disabled = s.Suspended;
+    return `
+      <div onclick="${disabled ? '' : `selectServer('${s.UUID}','${action}')`}"
+        class="flex items-center justify-between px-4 py-3.5 bg-neutral-900 border border-neutral-800 rounded-lg transition-colors ${disabled ? 'opacity-40 cursor-not-allowed' : 'hover:border-neutral-700 cursor-pointer'}">
+        <div class="min-w-0">
+          <p class="text-sm font-medium text-white truncate">${escapeHtml(s.name || s.UUID)}</p>
+          ${s.description ? `<p class="text-xs text-neutral-500 mt-0.5 truncate">${escapeHtml(s.description)}</p>` : ''}
+          ${disabled ? '<p class="text-xs text-amber-500 mt-1">Unavailable</p>' : ''}
+        </div>
+        ${!disabled ? '<svg class="w-4 h-4 text-neutral-600 flex-shrink-0 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>' : ''}
+      </div>`;
+  }).join('');
+}
+
+function selectServer(uuid, action) {
+  hideModal('serverSelectorModal');
+  currentServerUUID = uuid;
+  if (action === 'create') {
+    showModal('createBackupModal');
+  } else {
+    const b = backupsData.find(x => x.id === currentBackupId);
+    document.getElementById('restorePasswordGroup').classList.toggle('hidden', !b?.encrypted);
+    showModal('restoreBackupModal');
+  }
+}
+
+// ─── Disconnect ───────────────────────────────────────────────────
+
+async function disconnectGoogle() {
+  if (!confirm('Disconnect from Google Drive? Your backups will remain in Drive.')) return;
+  try {
+    const { success } = await fetch('/parachute/api/disconnect', { method: 'POST' }).then(r => r.json());
+    if (success) { showToast('Disconnected from Google Drive', 'success'); updateAuthStatus(); loadBackups(); }
+    else showToast('Failed to disconnect', 'error');
+  } catch { showToast('Failed to disconnect', 'error'); }
+}
+
+// ─── Filter / sort ────────────────────────────────────────────────
+
+function filterBackups() {
+  const q = document.getElementById('backupSearch').value.toLowerCase();
+  document.querySelectorAll('.backup-item').forEach(el => {
+    const name = el.querySelector('span')?.textContent?.toLowerCase() ?? '';
+    el.style.display = name.includes(q) ? '' : 'none';
+  });
+}
+
+function sortBackups() {
+  const val = document.getElementById('backupSort').value;
+  const sorted = [...backupsData].sort((a, b) => {
+    if (val === 'date-asc') return new Date(a.createdAt) - new Date(b.createdAt);
+    if (val === 'date-desc') return new Date(b.createdAt) - new Date(a.createdAt);
+    if (val === 'name-asc') return a.backupName.localeCompare(b.backupName);
+    if (val === 'name-desc') return b.backupName.localeCompare(a.backupName);
+    if (val === 'size-asc') return (a.fileSize || 0) - (b.fileSize || 0);
+    if (val === 'size-desc') return (b.fileSize || 0) - (a.fileSize || 0);
+    return 0;
+  });
+  renderBackups(sorted);
+}
+
+// ─── Progress modal ───────────────────────────────────────────────
+
+const BACKUP_STEPS = ['Creating backup on daemon','Downloading from daemon','Encrypting','Uploading to Drive','Cleaning up daemon','Saving to database'];
+const RESTORE_STEPS = ['Downloading from Drive','Decrypting','Restoring on daemon'];
+
+const BACKUP_MAP = {1:{pct:10,msg:'Creating backup on daemon…'},2:{pct:30,msg:'Downloading from daemon…'},3:{pct:50,msg:'Encrypting backup…'},4:{pct:70,msg:'Uploading to Google Drive…'},5:{pct:90,msg:'Cleaning up daemon…'},6:{pct:100,msg:'Saving to database…'}};
+const RESTORE_MAP = {7:{pct:33,msg:'Downloading from Drive…'},8:{pct:67,msg:'Decrypting backup…'},9:{pct:100,msg:'Restoring on daemon…'}};
+
+let pollTimer = null;
+
+function renderSteps(steps, activeIdx) {
+  return steps.map((label, i) => {
+    const done = i < activeIdx;
+    const active = i === activeIdx;
+    return `<div class="flex items-center gap-2.5">
+      <div class="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${done ? 'bg-emerald-500' : active ? 'border-2 border-emerald-400' : 'border-2 border-neutral-700'}">
+        ${done ? '<svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>' : active ? '<div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>' : ''}
+      </div>
+      <span class="text-xs ${done ? 'text-neutral-500 line-through' : active ? 'text-white font-medium' : 'text-neutral-600'}">${label}</span>
+    </div>`;
+  }).join('');
+}
+
+async function fetchProgress() {
+  try {
+    const { step } = await fetch('/parachute/api/progress', { cache: 'no-store' }).then(r => r.json());
+    const empty = document.getElementById('progressEmpty');
+    const active = document.getElementById('progressActive');
+
+    if (!step) {
+      empty.classList.remove('hidden'); active.classList.add('hidden'); return;
+    }
+
+    const isRestore = step >= 7;
+    const map = isRestore ? RESTORE_MAP : BACKUP_MAP;
+    const info = map[step] || { pct: 0, msg: 'Processing…' };
+    const steps = isRestore ? RESTORE_STEPS : BACKUP_STEPS;
+    const idx = isRestore ? step - 7 : step - 1;
+
+    empty.classList.add('hidden'); active.classList.remove('hidden');
+    document.getElementById('progressBar').style.width = `${info.pct}%`;
+    document.getElementById('progressMsg').textContent = info.msg;
+    document.getElementById('progressPct').textContent = `${info.pct}%`;
+    document.getElementById('stepsList').innerHTML = renderSteps(steps, idx);
+
+    if (info.pct >= 100) {
+      clearInterval(pollTimer); pollTimer = null;
+      setTimeout(() => { closeProgressModal(); loadBackups(); }, 1500);
+    }
+  } catch { /* non-fatal */ }
+}
+
+function openProgressModal() {
+  document.getElementById('progressModal').classList.remove('hidden');
+  fetchProgress();
+  if (!pollTimer) pollTimer = setInterval(fetchProgress, 5000);
+}
+
+function closeProgressModal() {
+  clearInterval(pollTimer); pollTimer = null;
+  document.getElementById('progressModal').classList.add('hidden');
+}
+
+window.openProgressModal = openProgressModal;
+window.closeProgressModal = closeProgressModal;
+
+// ─── Init ─────────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', () => {
+  updateAuthStatus();
+  loadBackups();
+
+  const params = new URLSearchParams(location.search);
+  if (params.get('success') === 'connected') {
+    showToast('Connected to Google Drive', 'success');
+    history.replaceState({}, '', '/parachute');
+  } else if (params.get('error')) {
+    showToast('Connection failed — check your credentials', 'error');
+    history.replaceState({}, '', '/parachute');
+  }
+});
+</script>
+
+<%- include(components.footer) %>
+
+<style>
+*, html, body { scrollbar-width: none; -ms-overflow-style: none; }
+::-webkit-scrollbar { display: none; }
+.no-scrollbar { overflow: auto; }
+</style>

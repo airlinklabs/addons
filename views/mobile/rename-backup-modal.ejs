@@ -1,0 +1,38 @@
+<div id="renameBackupModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end justify-center">
+  <div class="bg-[#111] border-t border-neutral-800 rounded-t-2xl w-full max-w-lg">
+    <div class="w-10 h-1 bg-neutral-700 rounded-full mx-auto mt-3"></div>
+    <div class="flex items-center justify-between px-5 py-4 border-b border-neutral-800">
+      <h2 class="text-sm font-semibold text-white">Rename backup</h2>
+      <button onclick="hideModal('renameBackupModal')" class="text-neutral-600 p-1">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="p-5">
+      <label class="block text-xs font-medium text-neutral-400 mb-1.5">New name <span class="text-red-400">*</span></label>
+      <input type="text" id="renameInput" maxlength="100" placeholder="Backup name"
+        class="w-full px-3.5 py-3 bg-neutral-800 border border-neutral-700 rounded-xl text-sm text-white placeholder-neutral-600 focus:outline-none">
+    </div>
+    <div class="flex gap-3 px-5 pb-8">
+      <button onclick="hideModal('renameBackupModal')" class="flex-1 py-3 text-sm text-neutral-400 bg-neutral-800 rounded-xl">Cancel</button>
+      <button onclick="handleRenameBackup()" class="flex-1 py-3 text-sm text-white bg-neutral-700 rounded-xl font-medium">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+async function handleRenameBackup() {
+  const name = document.getElementById('renameInput').value.trim();
+  if (!name) { showToast('Name required', 'error'); return; }
+  hideModal('renameBackupModal');
+  try {
+    const { success, error } = await fetch(`/parachute/api/backup/${currentBackupId}/rename`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    }).then(r => r.json());
+    if (success) { showToast('Backup renamed', 'success'); loadBackups(); }
+    else showToast(error || 'Failed to rename', 'error');
+  } catch { showToast('Network error', 'error'); }
+}
+</script>
