@@ -1,7 +1,7 @@
 {
   "name": "Parachute",
   "author": "AirLinkLab",
-  "repo": "https://github.com/airlinklabs/addons/tree/main",
+  "repo": "https://github.com/airlinklabs/addons",
   "branch": "parachute",
   "note": "Restart the panel after installation.",
   "commands": {
