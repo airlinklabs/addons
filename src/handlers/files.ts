@@ -8,6 +8,7 @@ import archiver from 'archiver';
 import FormData from 'form-data';
 import { PrismaClient, Logger, BackupResult, RestoreResult, ParachuteBackup, sendProgress, clearProgress } from '../types';
 import { getAuthenticatedClient, getDriveFolderId } from './oauth';
+import { SettingsManager } from '../settingsManager';
 
 async function checkServerAccess(userId: number | string, serverUUID: string, prisma: PrismaClient): Promise<boolean> {
   try {
@@ -269,7 +270,8 @@ export async function createBackup(
   password: string | undefined,
   passwordHint: string | undefined,
   prisma: PrismaClient,
-  logger: Logger
+  logger: Logger,
+  settingsMgr: SettingsManager
 ): Promise<BackupResult> {
   let downloadedPath: string | null = null;
   let encryptedPath: string | null = null;
@@ -285,7 +287,7 @@ export async function createBackup(
     if (server.Suspended) return { success: false, error: 'Server is suspended' };
 
     const [oauthClient, folderId] = await Promise.all([
-      getAuthenticatedClient(userId, prisma, logger),
+      getAuthenticatedClient(userId, prisma, logger, settingsMgr),
       getDriveFolderId(userId, prisma),
     ]);
 
@@ -323,9 +325,10 @@ export async function createBackup(
     await deleteFromDaemon(server as DaemonServer, daemonResult.backup.filePath, logger);
 
     sendProgress(userId, 6);
+    const provider = 'google_drive';
     await prisma.$executeRaw`
-      INSERT INTO Parachute_Backups (userId, driveFileId, backupName, serverUUID, encrypted, passwordHint, fileSize)
-      VALUES (${userId}, ${uploadResult.fileId}, ${name}, ${serverUUID}, ${encrypted}, ${passwordHint ?? null}, ${daemonResult.backup.size ?? 0})
+      INSERT INTO Parachute_Backups (userId, driveFileId, backupName, serverUUID, encrypted, passwordHint, fileSize, provider)
+      VALUES (${userId}, ${uploadResult.fileId}, ${name}, ${serverUUID}, ${encrypted}, ${passwordHint ?? null}, ${daemonResult.backup.size ?? 0}, ${provider})
     `;
 
     const rows: unknown[] = await prisma.$queryRaw`SELECT * FROM Parachute_Backups WHERE driveFileId = ${uploadResult.fileId}`;
@@ -347,7 +350,8 @@ export async function restoreBackup(
   serverUUID: string,
   password: string | undefined,
   prisma: PrismaClient,
-  logger: Logger
+  logger: Logger,
+  settingsMgr: SettingsManager
 ): Promise<RestoreResult> {
   let downloadPath: string | null = null;
   let decryptedPath: string | null = null;
@@ -365,7 +369,7 @@ export async function restoreBackup(
     if (!server?.node) return { success: false, error: 'Server or node not found' };
     if (!(await checkServerAccess(userId, serverUUID, prisma))) return { success: false, error: 'Access denied' };
 
-    const oauthClient = await getAuthenticatedClient(userId, prisma, logger);
+    const oauthClient = await getAuthenticatedClient(userId, prisma, logger, settingsMgr);
     if (!oauthClient) return { success: false, error: 'Not connected to Google Drive' };
 
     sendProgress(userId, 7);
@@ -404,13 +408,13 @@ export async function restoreBackup(
   }
 }
 
-export async function deleteBackup(userId: number | string, backupId: number, prisma: PrismaClient, logger: Logger): Promise<{ success: boolean; error?: string }> {
+export async function deleteBackup(userId: number | string, backupId: number, prisma: PrismaClient, logger: Logger, settingsMgr: SettingsManager): Promise<{ success: boolean; error?: string }> {
   try {
     const backups: unknown[] = await prisma.$queryRaw`SELECT * FROM Parachute_Backups WHERE id = ${backupId} AND userId = ${userId}`;
     if (!backups.length) return { success: false, error: 'Backup not found' };
     const backup = backups[0] as ParachuteBackup;
 
-    const oauthClient = await getAuthenticatedClient(userId, prisma, logger);
+    const oauthClient = await getAuthenticatedClient(userId, prisma, logger, settingsMgr);
     if (oauthClient) await deleteFromDrive(backup.driveFileId, oauthClient, logger);
 
     await prisma.$executeRaw`DELETE FROM Parachute_Backups WHERE id = ${backupId}`;

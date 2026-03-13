@@ -1,0 +1,622 @@
+<%- include(components.header, { title: title, user: user }) %>
+
+<main class="h-screen flex">
+  <div class="w-60 h-full flex-shrink-0">
+    <%- include(components.template) %>
+  </div>
+
+  <div class="flex-1 flex flex-col overflow-hidden pt-16">
+
+    <div class="flex-shrink-0 border-b border-neutral-200 dark:border-neutral-800 px-6 py-3 flex items-center justify-between bg-white dark:bg-transparent">
+      <nav class="flex items-center gap-2 text-sm">
+        <a href="/parachute" class="text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition-colors">Parachute</a>
+        <svg class="w-3.5 h-3.5 text-neutral-400 dark:text-neutral-700" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+        </svg>
+        <span class="text-neutral-900 dark:text-neutral-300 font-medium">Admin config</span>
+      </nav>
+      <div id="saveStatus" class="hidden flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        Saved
+      </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto no-scrollbar">
+      <div class="px-6 py-6 max-w-6xl">
+
+        <!-- Main two-column grid -->
+        <div class="grid grid-cols-2 gap-5 mb-5">
+
+          <!-- Left: General + Google Drive -->
+          <div class="space-y-5">
+
+            <!-- General -->
+            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl">
+              <div class="px-5 py-4 border-b border-neutral-200 dark:border-neutral-800">
+                <h2 class="text-sm font-semibold text-neutral-900 dark:text-white">General</h2>
+                <p class="text-xs text-neutral-500 mt-0.5">Core application settings</p>
+              </div>
+              <div class="p-5 space-y-4">
+                <div>
+                  <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5" for="appUrl">Application URL</label>
+                  <input type="url" id="appUrl" placeholder="https://panel.yourdomain.com"
+                    class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-sm text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors font-mono text-xs">
+                  <p class="text-xs text-neutral-400 dark:text-neutral-600 mt-1">Used for OAuth callback URLs</p>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5" for="cookieSecret">Cookie encryption secret</label>
+                  <div class="relative">
+                    <input type="password" id="cookieSecret" placeholder="Leave blank to keep existing"
+                      class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-sm text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors font-mono text-xs pr-20">
+                    <button type="button" onclick="generateSecret()" class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-neutral-500 hover:text-neutral-900 dark:hover:text-white px-2 py-1 rounded transition-colors">Generate</button>
+                  </div>
+                  <p class="text-xs text-neutral-400 dark:text-neutral-600 mt-1">Used to encrypt OAuth tokens at rest</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Google Drive -->
+            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl">
+              <div class="px-5 py-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
+                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    <h2 class="text-sm font-semibold text-neutral-900 dark:text-white">Google Drive</h2>
+                  </div>
+                  <p class="text-xs text-neutral-500 mt-0.5">OAuth2 credentials from Google Cloud Console</p>
+                </div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <span class="text-xs text-neutral-500">Enable</span>
+                  <input type="checkbox" id="googleEnabled" class="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-0">
+                </label>
+              </div>
+              <div class="p-5 space-y-3">
+                <div>
+                  <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">Client ID</label>
+                  <input type="text" id="googleClientId" placeholder="1234567890-abc.apps.googleusercontent.com"
+                    class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors font-mono">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">Client Secret</label>
+                  <input type="password" id="googleClientSecret" placeholder="Leave blank to keep existing"
+                    class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors font-mono">
+                </div>
+              </div>
+            </div>
+
+            <!-- WebDAV -->
+            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl">
+              <div class="px-5 py-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
+                <div>
+                  <h2 class="text-sm font-semibold text-neutral-900 dark:text-white">WebDAV</h2>
+                  <p class="text-xs text-neutral-500 mt-0.5">Nextcloud, ownCloud, any WebDAV server</p>
+                </div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <span class="text-xs text-neutral-500">Enable</span>
+                  <input type="checkbox" id="webdavEnabled" class="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-0">
+                </label>
+              </div>
+              <div class="p-5 space-y-3">
+                <div>
+                  <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">Server URL</label>
+                  <input type="url" id="webdavUrl" placeholder="https://cloud.example.com/remote.php/dav/files/user/"
+                    class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors font-mono">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">Username</label>
+                    <input type="text" id="webdavUsername" placeholder="username"
+                      class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">Password</label>
+                    <input type="password" id="webdavPassword" placeholder="Keep existing"
+                      class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors">
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">Base path</label>
+                  <input type="text" id="webdavBasePath" placeholder="/parachute"
+                    class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors font-mono">
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right: Dropbox + S3 + FTP + Setup guide -->
+          <div class="space-y-5">
+
+            <!-- Dropbox -->
+            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl">
+              <div class="px-5 py-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
+                <div>
+                  <h2 class="text-sm font-semibold text-neutral-900 dark:text-white">Dropbox</h2>
+                  <p class="text-xs text-neutral-500 mt-0.5">OAuth2 app credentials from Dropbox developers</p>
+                </div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <span class="text-xs text-neutral-500">Enable</span>
+                  <input type="checkbox" id="dropboxEnabled" class="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-0">
+                </label>
+              </div>
+              <div class="p-5 space-y-3">
+                <div>
+                  <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">App key</label>
+                  <input type="text" id="dropboxAppKey" placeholder="abc123def456"
+                    class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors font-mono">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">App secret</label>
+                  <input type="password" id="dropboxAppSecret" placeholder="Keep existing"
+                    class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors font-mono">
+                </div>
+              </div>
+            </div>
+
+            <!-- S3 -->
+            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl">
+              <div class="px-5 py-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
+                <div>
+                  <h2 class="text-sm font-semibold text-neutral-900 dark:text-white">S3 / R2 / MinIO</h2>
+                  <p class="text-xs text-neutral-500 mt-0.5">Any S3-compatible object storage</p>
+                </div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <span class="text-xs text-neutral-500">Enable</span>
+                  <input type="checkbox" id="s3Enabled" class="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-0">
+                </label>
+              </div>
+              <div class="p-5 space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">Access key ID</label>
+                    <input type="text" id="s3AccessKey" placeholder="AKIAIOSFODNN7EXAMPLE"
+                      class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors font-mono">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">Secret key</label>
+                    <input type="password" id="s3SecretKey" placeholder="Keep existing"
+                      class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors font-mono">
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">Bucket</label>
+                    <input type="text" id="s3Bucket" placeholder="my-backups"
+                      class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors font-mono">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">Region</label>
+                    <input type="text" id="s3Region" placeholder="us-east-1"
+                      class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors font-mono">
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">Endpoint <span class="text-neutral-400 dark:text-neutral-600">(leave blank for AWS)</span></label>
+                  <input type="url" id="s3Endpoint" placeholder="https://account.r2.cloudflarestorage.com"
+                    class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors font-mono">
+                </div>
+              </div>
+            </div>
+
+            <!-- FTP -->
+            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl">
+              <div class="px-5 py-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
+                <div>
+                  <h2 class="text-sm font-semibold text-neutral-900 dark:text-white">FTP / SFTP</h2>
+                  <p class="text-xs text-neutral-500 mt-0.5">Any FTP server with optional TLS</p>
+                </div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <span class="text-xs text-neutral-500">Enable</span>
+                  <input type="checkbox" id="ftpEnabled" class="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-0">
+                </label>
+              </div>
+              <div class="p-5 space-y-3">
+                <div class="grid grid-cols-3 gap-3">
+                  <div class="col-span-2">
+                    <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">Host</label>
+                    <input type="text" id="ftpHost" placeholder="ftp.example.com"
+                      class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors font-mono">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">Port</label>
+                    <input type="number" id="ftpPort" placeholder="21" min="1" max="65535"
+                      class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors">
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">Username</label>
+                    <input type="text" id="ftpUsername" placeholder="ftpuser"
+                      class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">Password</label>
+                    <input type="password" id="ftpPassword" placeholder="Keep existing"
+                      class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors">
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">Base path</label>
+                    <input type="text" id="ftpBasePath" placeholder="/parachute"
+                      class="w-full px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors font-mono">
+                  </div>
+                  <div class="flex items-end pb-0.5">
+                    <label class="flex items-center gap-2 cursor-pointer mb-2.5">
+                      <input type="checkbox" id="ftpSecure" class="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-0">
+                      <span class="text-xs text-neutral-600 dark:text-neutral-400">Use TLS</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Setup guide - full width -->
+        <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl mb-5">
+          <button onclick="toggleGuide()" class="w-full px-5 py-4 flex items-center justify-between text-left">
+            <div>
+              <h2 class="text-sm font-semibold text-neutral-900 dark:text-white">Setup guide</h2>
+              <p class="text-xs text-neutral-500 mt-0.5">Step-by-step instructions for each provider</p>
+            </div>
+            <svg id="guideChevron" class="w-4 h-4 text-neutral-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+
+          <div id="guideContent" class="hidden border-t border-neutral-200 dark:border-neutral-800">
+            <!-- Guide tabs -->
+            <div class="flex border-b border-neutral-200 dark:border-neutral-800 px-5">
+              <% [['google', 'Google Drive'], ['webdav', 'WebDAV'], ['dropbox', 'Dropbox'], ['s3', 'S3 / R2'], ['ftp', 'FTP']].forEach(function(tab) { %>
+              <button onclick="showGuideTab('<%= tab[0] %>')" id="guideTab-<%= tab[0] %>"
+                class="guide-tab px-4 py-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap -mb-px
+                  <%= tab[0] === 'google' ? 'border-neutral-900 dark:border-white text-neutral-900 dark:text-white' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300' %>">
+                <%= tab[1] %>
+              </button>
+              <% }); %>
+            </div>
+
+            <div class="p-5">
+              <!-- Google Drive guide -->
+              <div id="guide-google" class="guide-content space-y-4">
+                <div class="grid grid-cols-3 gap-4">
+                  <div class="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg border border-neutral-200 dark:border-neutral-800">
+                    <div class="flex items-center gap-2 mb-2">
+                      <div class="w-5 h-5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
+                      <p class="text-xs font-medium text-neutral-900 dark:text-white">Open Google Cloud Console</p>
+                    </div>
+                    <p class="text-xs text-neutral-500 leading-relaxed">Go to <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">console.cloud.google.com/apis/credentials</a> and create or select a project.</p>
+                  </div>
+                  <div class="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg border border-neutral-200 dark:border-neutral-800">
+                    <div class="flex items-center gap-2 mb-2">
+                      <div class="w-5 h-5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
+                      <p class="text-xs font-medium text-neutral-900 dark:text-white">Create OAuth credentials</p>
+                    </div>
+                    <p class="text-xs text-neutral-500 leading-relaxed">Click <strong class="text-neutral-700 dark:text-neutral-300">Create credentials → OAuth client ID</strong>. Choose <em>Web application</em>.</p>
+                  </div>
+                  <div class="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg border border-neutral-200 dark:border-neutral-800">
+                    <div class="flex items-center gap-2 mb-2">
+                      <div class="w-5 h-5 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
+                      <p class="text-xs font-medium text-neutral-900 dark:text-white">Add callback URL</p>
+                    </div>
+                    <p class="text-xs text-neutral-500 leading-relaxed">Under <em>Authorized redirect URIs</em>, add:</p>
+                    <code class="text-xs text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded block mt-1 font-mono overflow-x-auto">{APP_URL}/parachute/oauth/google/callback</code>
+                  </div>
+                </div>
+                <div class="p-3 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-lg text-xs text-blue-700 dark:text-blue-300/80">
+                  Enable the <strong>Google Drive API</strong> and <strong>Google People API</strong> in your project's API library before connecting.
+                </div>
+              </div>
+
+              <!-- WebDAV guide -->
+              <div id="guide-webdav" class="guide-content hidden space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg border border-neutral-200 dark:border-neutral-800">
+                    <p class="text-xs font-medium text-neutral-900 dark:text-white mb-2">Nextcloud / ownCloud</p>
+                    <p class="text-xs text-neutral-500 leading-relaxed mb-2">Find your WebDAV URL in <strong class="text-neutral-700 dark:text-neutral-300">Files → Settings</strong>. It typically looks like:</p>
+                    <code class="text-xs font-mono text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded block overflow-x-auto">https://cloud.example.com/remote.php/dav/files/USERNAME/</code>
+                  </div>
+                  <div class="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg border border-neutral-200 dark:border-neutral-800">
+                    <p class="text-xs font-medium text-neutral-900 dark:text-white mb-2">Generic WebDAV server</p>
+                    <p class="text-xs text-neutral-500 leading-relaxed">Enter the full WebDAV endpoint URL including path. Use your account credentials. Set <strong class="text-neutral-700 dark:text-neutral-300">Base path</strong> to a folder where backups will be stored.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dropbox guide -->
+              <div id="guide-dropbox" class="guide-content hidden space-y-4">
+                <div class="grid grid-cols-3 gap-4">
+                  <div class="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg border border-neutral-200 dark:border-neutral-800">
+                    <p class="text-xs font-medium text-neutral-900 dark:text-white mb-2">Create an app</p>
+                    <p class="text-xs text-neutral-500 leading-relaxed">Go to <a href="https://www.dropbox.com/developers/apps" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">dropbox.com/developers/apps</a>, click <strong>Create app</strong>. Choose <em>Scoped access → Full Dropbox</em>.</p>
+                  </div>
+                  <div class="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg border border-neutral-200 dark:border-neutral-800">
+                    <p class="text-xs font-medium text-neutral-900 dark:text-white mb-2">Set redirect URI</p>
+                    <p class="text-xs text-neutral-500 leading-relaxed">In your app's <em>OAuth 2</em> settings, add the redirect URI:</p>
+                    <code class="text-xs text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded block mt-1 font-mono overflow-x-auto">{APP_URL}/parachute/oauth/dropbox/callback</code>
+                  </div>
+                  <div class="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg border border-neutral-200 dark:border-neutral-800">
+                    <p class="text-xs font-medium text-neutral-900 dark:text-white mb-2">Copy credentials</p>
+                    <p class="text-xs text-neutral-500 leading-relaxed">Copy the <strong class="text-neutral-700 dark:text-neutral-300">App key</strong> and <strong class="text-neutral-700 dark:text-neutral-300">App secret</strong> from the app settings page into the fields above.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- S3 guide -->
+              <div id="guide-s3" class="guide-content hidden space-y-4">
+                <div class="grid grid-cols-3 gap-4">
+                  <div class="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg border border-neutral-200 dark:border-neutral-800">
+                    <p class="text-xs font-medium text-neutral-900 dark:text-white mb-2">AWS S3</p>
+                    <p class="text-xs text-neutral-500 leading-relaxed">Create an IAM user with <code class="font-mono">s3:PutObject</code>, <code class="font-mono">s3:GetObject</code>, <code class="font-mono">s3:DeleteObject</code> on your bucket. Leave endpoint blank.</p>
+                  </div>
+                  <div class="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg border border-neutral-200 dark:border-neutral-800">
+                    <p class="text-xs font-medium text-neutral-900 dark:text-white mb-2">Cloudflare R2</p>
+                    <p class="text-xs text-neutral-500 leading-relaxed">Create R2 API token with read/write access. Endpoint: <code class="text-xs font-mono text-neutral-600 dark:text-neutral-400">https://ACCOUNT_ID.r2.cloudflarestorage.com</code>. Region: <code class="font-mono">auto</code>.</p>
+                  </div>
+                  <div class="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg border border-neutral-200 dark:border-neutral-800">
+                    <p class="text-xs font-medium text-neutral-900 dark:text-white mb-2">MinIO / self-hosted</p>
+                    <p class="text-xs text-neutral-500 leading-relaxed">Use your MinIO access key and secret. Set endpoint to your MinIO server URL. Any region string works — set to <code class="font-mono">us-east-1</code> if unsure.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- FTP guide -->
+              <div id="guide-ftp" class="guide-content hidden space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg border border-neutral-200 dark:border-neutral-800">
+                    <p class="text-xs font-medium text-neutral-900 dark:text-white mb-2">Standard FTP</p>
+                    <p class="text-xs text-neutral-500 leading-relaxed">Enter the hostname (not the URL), port 21, and your FTP credentials. Set <strong class="text-neutral-700 dark:text-neutral-300">Base path</strong> to an existing directory on the server where backups will be stored.</p>
+                  </div>
+                  <div class="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg border border-neutral-200 dark:border-neutral-800">
+                    <p class="text-xs font-medium text-neutral-900 dark:text-white mb-2">FTP with TLS (FTPS)</p>
+                    <p class="text-xs text-neutral-500 leading-relaxed">Enable the <strong class="text-neutral-700 dark:text-neutral-300">Use TLS</strong> toggle to use FTPS (explicit TLS). Your server must support TLS on the configured port. SFTP (SSH) is not the same as FTPS.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Save bar -->
+        <div class="flex items-center justify-between py-4 border-t border-neutral-200 dark:border-neutral-800">
+          <p class="text-xs text-neutral-400 dark:text-neutral-600">Settings are encrypted with AES-256-GCM before being written to disk</p>
+          <div class="flex items-center gap-3">
+            <button onclick="loadSettings()" class="px-4 py-2 text-xs text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 border border-neutral-200 dark:border-neutral-700 rounded-lg transition-colors">
+              Reload
+            </button>
+            <button onclick="saveSettings()" class="px-5 py-2 text-sm text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors font-medium">
+              Save settings
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="notification" class="fixed top-4 right-4 z-50 hidden">
+  <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-xl p-4 min-w-72">
+    <div class="flex items-start gap-3">
+      <div id="notificationIcon" class="flex-shrink-0 mt-0.5"></div>
+      <div class="flex-1">
+        <div id="notificationTitle" class="font-medium text-neutral-900 dark:text-white text-sm"></div>
+        <div id="notificationMessage" class="text-neutral-500 dark:text-neutral-400 text-xs mt-0.5"></div>
+      </div>
+      <button onclick="hideNotification()" class="text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+*, html, body { scrollbar-width: none; -ms-overflow-style: none; }
+::-webkit-scrollbar { display: none; }
+.no-scrollbar { overflow: auto; }
+</style>
+
+<script>
+var currentSettings = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+  loadSettings();
+});
+
+function loadSettings() {
+  fetch('/parachute/api/admin/settings', { credentials: 'include' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!data.success) { showNotification('Error', data.error || 'Failed to load settings', 'error'); return; }
+      currentSettings = data.data;
+      populateForm(data.data);
+    })
+    .catch(function() { showNotification('Error', 'Could not reach server', 'error'); });
+}
+
+function populateForm(s) {
+  setVal('appUrl', s.appUrl || '');
+  setVal('cookieSecret', '');
+
+  var gd = s.providers && s.providers.google_drive;
+  if (gd) {
+    setChecked('googleEnabled', gd.enabled);
+    setVal('googleClientId', gd.clientId || '');
+    setVal('googleClientSecret', '');
+  }
+
+  var wd = s.providers && s.providers.webdav;
+  if (wd) {
+    setChecked('webdavEnabled', wd.enabled);
+    setVal('webdavUrl', wd.url || '');
+    setVal('webdavUsername', wd.username || '');
+    setVal('webdavPassword', '');
+    setVal('webdavBasePath', wd.basePath || '/parachute');
+  }
+
+  var db = s.providers && s.providers.dropbox;
+  if (db) {
+    setChecked('dropboxEnabled', db.enabled);
+    setVal('dropboxAppKey', db.appKey || '');
+    setVal('dropboxAppSecret', '');
+  }
+
+  var s3 = s.providers && s.providers.s3;
+  if (s3) {
+    setChecked('s3Enabled', s3.enabled);
+    setVal('s3AccessKey', s3.accessKeyId || '');
+    setVal('s3SecretKey', '');
+    setVal('s3Bucket', s3.bucket || '');
+    setVal('s3Region', s3.region || 'us-east-1');
+    setVal('s3Endpoint', s3.endpoint || '');
+  }
+
+  var ftp = s.providers && s.providers.ftp;
+  if (ftp) {
+    setChecked('ftpEnabled', ftp.enabled);
+    setVal('ftpHost', ftp.host || '');
+    setVal('ftpPort', ftp.port || 21);
+    setVal('ftpUsername', ftp.username || '');
+    setVal('ftpPassword', '');
+    setVal('ftpBasePath', ftp.basePath || '/parachute');
+    setChecked('ftpSecure', ftp.secure || false);
+  }
+}
+
+function buildPayload() {
+  var payload = {
+    appUrl: getVal('appUrl'),
+    providers: {
+      google_drive: {
+        type: 'google_drive',
+        enabled: getChecked('googleEnabled'),
+        clientId: getVal('googleClientId'),
+        clientSecret: getVal('googleClientSecret') || '••••••••',
+      },
+      webdav: {
+        type: 'webdav',
+        enabled: getChecked('webdavEnabled'),
+        url: getVal('webdavUrl'),
+        username: getVal('webdavUsername'),
+        password: getVal('webdavPassword') || '••••••••',
+        basePath: getVal('webdavBasePath') || '/parachute',
+      },
+      dropbox: {
+        type: 'dropbox',
+        enabled: getChecked('dropboxEnabled'),
+        appKey: getVal('dropboxAppKey'),
+        appSecret: getVal('dropboxAppSecret') || '••••••••',
+      },
+      s3: {
+        type: 's3',
+        enabled: getChecked('s3Enabled'),
+        accessKeyId: getVal('s3AccessKey'),
+        secretAccessKey: getVal('s3SecretKey') || '••••••••',
+        bucket: getVal('s3Bucket'),
+        region: getVal('s3Region') || 'us-east-1',
+        endpoint: getVal('s3Endpoint'),
+      },
+      ftp: {
+        type: 'ftp',
+        enabled: getChecked('ftpEnabled'),
+        host: getVal('ftpHost'),
+        port: parseInt(getVal('ftpPort')) || 21,
+        username: getVal('ftpUsername'),
+        password: getVal('ftpPassword') || '••••••••',
+        basePath: getVal('ftpBasePath') || '/parachute',
+        secure: getChecked('ftpSecure'),
+      },
+    },
+  };
+  var secret = getVal('cookieSecret');
+  if (secret) payload.cookieSecret = secret;
+  return payload;
+}
+
+function saveSettings() {
+  var payload = buildPayload();
+  fetch('/parachute/api/admin/settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.success) {
+      showNotification('Saved', 'Settings encrypted and saved', 'success');
+      var status = document.getElementById('saveStatus');
+      status.classList.remove('hidden');
+      setTimeout(function() { status.classList.add('hidden'); }, 3000);
+      loadSettings();
+    } else {
+      showNotification('Error', data.error || 'Save failed', 'error');
+    }
+  })
+  .catch(function() { showNotification('Error', 'Network error', 'error'); });
+}
+
+function generateSecret() {
+  var arr = new Uint8Array(32);
+  crypto.getRandomValues(arr);
+  var hex = Array.from(arr).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+  document.getElementById('cookieSecret').value = hex;
+  document.getElementById('cookieSecret').type = 'text';
+  setTimeout(function() { document.getElementById('cookieSecret').type = 'password'; }, 3000);
+  showNotification('Generated', 'New secret generated — save to apply', 'success', 3000);
+}
+
+function toggleGuide() {
+  var content = document.getElementById('guideContent');
+  var chevron = document.getElementById('guideChevron');
+  var hidden = content.classList.contains('hidden');
+  content.classList.toggle('hidden', !hidden);
+  chevron.style.transform = hidden ? 'rotate(180deg)' : '';
+}
+
+function showGuideTab(name) {
+  document.querySelectorAll('.guide-content').forEach(function(el) { el.classList.add('hidden'); });
+  document.querySelectorAll('.guide-tab').forEach(function(btn) {
+    btn.classList.remove('border-neutral-900', 'dark:border-white', 'text-neutral-900', 'dark:text-white');
+    btn.classList.add('border-transparent', 'text-neutral-500');
+  });
+  document.getElementById('guide-' + name).classList.remove('hidden');
+  var active = document.getElementById('guideTab-' + name);
+  active.classList.remove('border-transparent', 'text-neutral-500');
+  active.classList.add('border-neutral-900', 'dark:border-white', 'text-neutral-900', 'dark:text-white');
+}
+
+function setVal(id, val) { var el = document.getElementById(id); if (el) el.value = val; }
+function getVal(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+function setChecked(id, val) { var el = document.getElementById(id); if (el) el.checked = !!val; }
+function getChecked(id) { var el = document.getElementById(id); return el ? el.checked : false; }
+
+function showNotification(title, message, type, duration) {
+  type = type || 'info'; duration = duration == null ? 4000 : duration;
+  var icons = {
+    success: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>',
+    error: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>',
+    info: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+  };
+  var colors = { success: 'emerald', error: 'red', info: 'blue' };
+  var color = colors[type] || 'blue';
+  document.getElementById('notificationIcon').innerHTML = '<div class="w-7 h-7 bg-' + color + '-500 rounded-full flex items-center justify-center text-white">' + (icons[type] || icons.info) + '</div>';
+  document.getElementById('notificationTitle').textContent = title;
+  document.getElementById('notificationMessage').textContent = message;
+  document.getElementById('notification').classList.remove('hidden');
+  if (duration > 0) setTimeout(hideNotification, duration);
+}
+
+function hideNotification() { document.getElementById('notification').classList.add('hidden'); }
+</script>

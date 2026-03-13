@@ -6,90 +6,93 @@
   </div>
 
   <div class="flex-1 flex flex-col overflow-hidden pt-16">
-    <div class="flex-1 overflow-y-auto no-scrollbar">
-      <div class="max-w-5xl mx-auto px-8 py-8">
 
-        <div class="flex items-end justify-between mb-7">
-          <div>
-            <h1 class="text-2xl font-semibold text-white tracking-tight">Parachute</h1>
-            <p class="text-sm text-neutral-500 mt-1">Backup and restore servers to Google Drive</p>
-          </div>
-          <button onclick="openProgressModal()"
-            class="flex items-center gap-2 px-3.5 py-2 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 text-neutral-300 hover:text-white rounded-lg text-sm transition-all">
-            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-            </svg>
-            Progress
-          </button>
+    <div class="flex-shrink-0 border-b border-neutral-200 dark:border-neutral-800 px-6 py-3 flex items-center justify-between bg-white dark:bg-transparent">
+      <div class="flex items-center gap-3">
+        <h1 class="text-sm font-semibold text-neutral-900 dark:text-white">Parachute</h1>
+        <span class="text-neutral-300 dark:text-neutral-700">·</span>
+        <p class="text-sm text-neutral-500">Server backup and restore</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="openProgressModal()"
+          class="flex items-center gap-1.5 px-3 py-1.5 text-xs text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white bg-neutral-100 dark:bg-neutral-800/60 hover:bg-neutral-200 dark:hover:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg transition-colors">
+          <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+          Progress
+        </button>
+      </div>
+    </div>
+
+    <div class="flex-1 overflow-hidden flex">
+
+      <!-- Left panel: connection + stats -->
+      <div class="w-72 flex-shrink-0 border-r border-neutral-200 dark:border-neutral-800 flex flex-col overflow-y-auto no-scrollbar">
+        <div class="p-5 border-b border-neutral-200 dark:border-neutral-800">
+          <%- include(components.providerPanel) %>
         </div>
 
-        <div class="mb-6">
-          <%- include(components.google) %>
-        </div>
-
-        <div id="statsRow" class="hidden grid grid-cols-3 gap-4 mb-6">
-          <div class="bg-neutral-900 border border-neutral-800 rounded-lg px-5 py-4">
-            <p class="text-xs text-neutral-500 uppercase tracking-wide mb-1">Backups</p>
-            <p class="text-2xl font-semibold text-white" id="statTotal">0</p>
-          </div>
-          <div class="bg-neutral-900 border border-neutral-800 rounded-lg px-5 py-4">
-            <p class="text-xs text-neutral-500 uppercase tracking-wide mb-1">Total size</p>
-            <p class="text-2xl font-semibold text-white" id="statSize">—</p>
-          </div>
-          <div class="bg-neutral-900 border border-neutral-800 rounded-lg px-5 py-4">
-            <p class="text-xs text-neutral-500 uppercase tracking-wide mb-1">Encrypted</p>
-            <p class="text-2xl font-semibold text-white" id="statEncrypted">0</p>
-          </div>
-        </div>
-
-        <%- include(components.fileList) %>
-
-        <div class="mt-10 pt-5 border-t border-neutral-900 flex items-center justify-between">
-          <div class="flex items-center gap-1.5 text-xs text-neutral-600">
-            <span>Parachute by</span>
-            <a href="https://github.com/g-flame-oss" target="_blank" class="text-neutral-400 hover:text-white transition-colors">g-flame</a>
-            <span>·</span>
-            <span>Panel by</span>
-            <a href="https://github.com/AirlinkLabs" target="_blank" class="text-neutral-400 hover:text-white transition-colors">AirlinkLabs</a>
-          </div>
-          <div class="flex items-center gap-3 text-xs">
-            <a href="https://github.com/g-flame-oss/airlink-addons" target="_blank" class="text-neutral-600 hover:text-neutral-400 transition-colors">GitHub</a>
-            <span class="text-neutral-800">·</span>
-            <a href="https://discord.gg/TQzUeg2wJx" target="_blank" class="text-neutral-600 hover:text-neutral-400 transition-colors">Discord</a>
+        <div id="statsSection" class="hidden p-5 border-b border-neutral-200 dark:border-neutral-800 space-y-3">
+          <p class="text-xs font-medium text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">Overview</p>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg px-3 py-3">
+              <p class="text-xl font-semibold text-neutral-900 dark:text-white leading-none" id="statTotal">0</p>
+              <p class="text-xs text-neutral-500 mt-1">Backups</p>
+            </div>
+            <div class="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg px-3 py-3">
+              <p class="text-xl font-semibold text-neutral-900 dark:text-white leading-none" id="statSize">—</p>
+              <p class="text-xs text-neutral-500 mt-1">Total size</p>
+            </div>
+            <div class="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg px-3 py-3">
+              <p class="text-xl font-semibold text-neutral-900 dark:text-white leading-none" id="statEncrypted">0</p>
+              <p class="text-xs text-neutral-500 mt-1">Encrypted</p>
+            </div>
+            <div class="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg px-3 py-3">
+              <p class="text-xl font-semibold text-neutral-900 dark:text-white leading-none" id="statServers">—</p>
+              <p class="text-xs text-neutral-500 mt-1">Servers</p>
+            </div>
           </div>
         </div>
 
       </div>
+
+      <!-- Right panel: backup list -->
+      <div class="flex-1 flex flex-col min-w-0">
+        <%- include(components.fileList) %>
+      </div>
+
     </div>
   </div>
 </main>
 
 <!-- Progress modal -->
-<div id="progressModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-  <div class="bg-[#111] border border-neutral-800 rounded-xl w-full max-w-md relative">
-    <button onclick="closeProgressModal()" class="absolute top-4 right-4 text-neutral-500 hover:text-white transition-colors">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-      </svg>
-    </button>
-    <div class="p-6 border-b border-neutral-800">
-      <h3 class="text-base font-semibold text-white">Operation progress</h3>
-      <p class="text-xs text-neutral-500 mt-0.5">Updates every 5 seconds</p>
+<div id="progressModal" class="hidden fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl w-full max-w-md shadow-2xl">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-neutral-200 dark:border-neutral-800">
+      <div>
+        <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">Operation progress</h3>
+        <p class="text-xs text-neutral-500 mt-0.5">Polls every 5 seconds</p>
+      </div>
+      <button onclick="closeProgressModal()" class="text-neutral-400 hover:text-neutral-700 dark:hover:text-white transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
     </div>
-    <div class="p-6">
+    <div class="p-5">
       <div id="progressEmpty" class="text-center py-6">
-        <p class="text-sm text-neutral-500">No operations running</p>
+        <p class="text-sm text-neutral-400 dark:text-neutral-500">No active operation</p>
       </div>
       <div id="progressActive" class="hidden">
-        <p id="progressMsg" class="text-sm text-white font-medium mb-4">Preparing...</p>
-        <div class="bg-neutral-800 rounded-full h-2 mb-2 overflow-hidden">
+        <p id="progressMsg" class="text-sm font-medium text-neutral-900 dark:text-white mb-3">Preparing...</p>
+        <div class="bg-neutral-200 dark:bg-neutral-800 rounded-full h-1.5 mb-1 overflow-hidden">
           <div id="progressBar" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width:0%"></div>
         </div>
         <div class="flex justify-between items-center mb-5">
-          <span id="progressPct" class="text-xs text-emerald-400 font-medium">0%</span>
-          <span class="text-xs text-neutral-600">may take several minutes</span>
+          <span id="progressPct" class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">0%</span>
+          <span class="text-xs text-neutral-400 dark:text-neutral-600">may take several minutes</span>
         </div>
-        <div id="stepsList" class="space-y-2.5"></div>
+        <div id="stepsList" class="space-y-2"></div>
       </div>
     </div>
   </div>
@@ -107,185 +110,140 @@ let currentBackupId = null;
 let currentServerUUID = null;
 let backupsData = [];
 
-// ─── Modal helpers ───────────────────────────────────────────────
-
-function showModal(id) {
-  document.getElementById(id).classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-}
-
-function hideModal(id) {
-  document.getElementById(id).classList.add('hidden');
-  document.body.style.overflow = '';
-}
-
-// ─── Auth status ─────────────────────────────────────────────────
+function showModal(id) { document.getElementById(id).classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+function hideModal(id) { document.getElementById(id).classList.add('hidden'); document.body.style.overflow = ''; }
 
 async function updateAuthStatus() {
   try {
     const { success, data } = await fetch('/parachute/api/status').then(r => r.json());
     const connected = success && data?.connected;
-    document.getElementById('googleConnected').classList.toggle('hidden', !connected);
-    document.getElementById('googleDisconnected').classList.toggle('hidden', connected);
-    document.getElementById('statsRow').classList.toggle('hidden', !connected);
+    document.getElementById('providerConnected').classList.toggle('hidden', !connected);
+    document.getElementById('providerDisconnected').classList.toggle('hidden', connected);
+    document.getElementById('statsSection').classList.toggle('hidden', !connected);
     if (connected) {
-      if (data.pictureUrl) document.getElementById('googlePicture').src = data.pictureUrl;
-      document.getElementById('googleName').textContent = data.displayName || 'Connected';
-      document.getElementById('googleEmail').textContent = data.email || '';
-      document.getElementById('googleFolder').textContent = data.folderName || '';
+      if (data.pictureUrl) document.getElementById('providerPicture').src = data.pictureUrl;
+      document.getElementById('providerName').textContent = data.displayName || 'Connected';
+      document.getElementById('providerEmail').textContent = data.email || '';
+      document.getElementById('providerFolder').textContent = data.folderName || '';
     }
-  } catch (err) {
-    console.error('Auth status error:', err);
-  }
+  } catch (err) { console.error('Auth status error:', err); }
 }
-
-// ─── Backups ──────────────────────────────────────────────────────
 
 async function loadBackups() {
   try {
     const { success, data } = await fetch('/parachute/api/backups').then(r => r.json());
-    if (success) {
-      backupsData = data;
-      renderBackups(data);
-      updateStats(data);
-    }
-  } catch (err) {
-    console.error('Load backups error:', err);
-    showToast('Failed to load backups', 'error');
-  }
+    if (success) { backupsData = data; renderBackups(data); updateStats(data); }
+  } catch (err) { console.error('Load backups error:', err); showToast('Failed to load backups', 'error'); }
 }
 
 function updateStats(backups) {
   document.getElementById('statTotal').textContent = backups.length;
   document.getElementById('statSize').textContent = formatBytes(backups.reduce((n, b) => n + (b.fileSize || 0), 0));
   document.getElementById('statEncrypted').textContent = backups.filter(b => b.encrypted === 1).length;
+  document.getElementById('statServers').textContent = new Set(backups.map(b => b.serverUUID)).size || '—';
 }
 
-function escapeHtml(text) {
-  const el = document.createElement('div');
-  el.textContent = text;
-  return el.innerHTML;
-}
+function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
 
 function formatBytes(bytes) {
   if (!bytes) return '0 B';
-  const units = ['B', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`;
+  const u = ['B','KB','MB','GB']; const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${u[i]}`;
 }
 
 function renderBackups(list) {
   const el = document.getElementById('backupsList');
   if (!list.length) {
-    el.innerHTML = `<div class="text-center py-16">
-      <svg class="w-12 h-12 text-neutral-700 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    el.innerHTML = `<div class="flex flex-col items-center justify-center h-full min-h-64 py-16">
+      <svg class="w-10 h-10 text-neutral-300 dark:text-neutral-700 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
       </svg>
-      <p class="text-sm text-neutral-500">No backups yet</p>
-      <p class="text-xs text-neutral-600 mt-1">Connect Google Drive and create your first backup</p>
+      <p class="text-sm font-medium text-neutral-500 dark:text-neutral-400">No backups</p>
+      <p class="text-xs text-neutral-400 dark:text-neutral-600 mt-1">Connect a storage provider and create your first backup</p>
     </div>`;
     return;
   }
   el.innerHTML = list.map(b => `
-    <div class="backup-item flex items-center justify-between px-5 py-4 bg-neutral-900 border border-neutral-800 rounded-lg hover:border-neutral-700 transition-colors" data-id="${b.id}">
-      <div class="flex-1 min-w-0 mr-4">
-        <div class="flex items-center gap-2.5 mb-1">
-          <span class="text-sm font-medium text-white truncate">${escapeHtml(b.backupName)}</span>
-          ${b.encrypted ? '<span class="flex-shrink-0 text-xs px-1.5 py-0.5 bg-amber-500/10 text-amber-400 rounded border border-amber-500/20">encrypted</span>' : ''}
+    <div class="backup-row group flex items-center gap-4 px-5 py-3.5 border-b border-neutral-100 dark:border-neutral-800/50 hover:bg-neutral-50 dark:hover:bg-white/[0.02] transition-colors" data-id="${b.id}">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 mb-0.5">
+          <span class="text-sm font-medium text-neutral-900 dark:text-white truncate">${escapeHtml(b.backupName)}</span>
+          ${b.encrypted ? '<span class="flex-shrink-0 text-xs px-1.5 py-0.5 bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded border border-amber-200 dark:border-amber-500/20 font-medium">enc</span>' : ''}
         </div>
-        <div class="flex items-center gap-4 text-xs text-neutral-500">
-          <span>${new Date(b.createdAt).toLocaleString()}</span>
-          ${b.fileSize ? `<span>${formatBytes(b.fileSize)}</span>` : ''}
-          <span class="font-mono">${b.serverUUID.substring(0, 8)}…</span>
+        <div class="flex items-center gap-2 text-xs text-neutral-400 dark:text-neutral-500">
+          <span>${new Date(b.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+          <span class="text-neutral-300 dark:text-neutral-700">·</span>
+          <span>${new Date(b.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>
+          ${b.fileSize ? `<span class="text-neutral-300 dark:text-neutral-700">·</span><span>${formatBytes(b.fileSize)}</span>` : ''}
         </div>
       </div>
-      <div class="flex items-center gap-2 flex-shrink-0">
+      <span class="text-xs text-neutral-400 dark:text-neutral-600 font-mono flex-shrink-0" title="${b.serverUUID}">${b.serverUUID.substring(0,8)}…</span>
+      <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
         <button onclick="initiateRename(${b.id})" title="Rename"
-          class="p-2 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-          </svg>
+          class="p-1.5 text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
         </button>
-        <button onclick="initiateRestore(${b.id})" title="Restore"
-          class="px-3 py-1.5 text-xs bg-emerald-600/10 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-600/20 hover:border-emerald-600 rounded-lg transition-all">
+        <button onclick="initiateRestore(${b.id})"
+          class="px-2.5 py-1 text-xs bg-emerald-50 dark:bg-emerald-600/10 hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-200 dark:border-emerald-600/20 hover:border-emerald-500 rounded-md transition-all">
           Restore
         </button>
         <button onclick="initiateDelete(${b.id})" title="Delete"
-          class="p-2 text-neutral-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-          </svg>
+          class="p-1.5 text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-md transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
         </button>
       </div>
     </div>
   `).join('');
 }
 
-// ─── Initiate actions ─────────────────────────────────────────────
-
 function initiateCreate() {
   document.getElementById('serverSelectorTitle').textContent = 'Select server to back up';
-  document.getElementById('serverSelectorDesc').textContent = 'Choose which server to create a backup of';
-  showModal('serverSelectorModal');
-  loadServers('create');
+  document.getElementById('serverSelectorDesc').textContent = 'Choose which server you want to create a backup of';
+  showModal('serverSelectorModal'); loadServers('create');
 }
-
 function initiateRestore(id) {
   currentBackupId = id;
   document.getElementById('serverSelectorTitle').textContent = 'Select restore target';
   document.getElementById('serverSelectorDesc').textContent = 'Choose which server to restore this backup to';
-  showModal('serverSelectorModal');
-  loadServers('restore');
+  showModal('serverSelectorModal'); loadServers('restore');
 }
-
 function initiateRename(id) {
   currentBackupId = id;
   const b = backupsData.find(x => x.id === id);
   if (b) { document.getElementById('renameInput').value = b.backupName; showModal('renameBackupModal'); }
 }
-
 function initiateDelete(id) {
   currentBackupId = id;
   const b = backupsData.find(x => x.id === id);
   if (b) { document.getElementById('deleteBackupName').textContent = b.backupName; showModal('deleteConfirmModal'); }
 }
 
-// ─── Servers ──────────────────────────────────────────────────────
-
 async function loadServers(action) {
   try {
     const { success, data } = await fetch('/parachute/api/servers').then(r => r.json());
     if (success) renderServers(data, action);
-  } catch (err) {
-    console.error('Load servers error:', err);
-    showToast('Failed to load servers', 'error');
-  }
+  } catch { showToast('Failed to load servers', 'error'); }
 }
 
 function renderServers(servers, action) {
   const el = document.getElementById('serversList');
-  if (!servers.length) {
-    el.innerHTML = '<div class="text-center py-10"><p class="text-sm text-neutral-500">No servers available</p></div>';
-    return;
-  }
+  if (!servers.length) { el.innerHTML = '<div class="text-center py-10"><p class="text-sm text-neutral-500">No servers available</p></div>'; return; }
   el.innerHTML = servers.map(s => {
     const disabled = s.Suspended;
-    return `
-      <div onclick="${disabled ? '' : `selectServer('${s.UUID}','${action}')`}"
-        class="flex items-center justify-between px-4 py-3.5 bg-neutral-900 border border-neutral-800 rounded-lg transition-colors ${disabled ? 'opacity-40 cursor-not-allowed' : 'hover:border-neutral-700 cursor-pointer'}">
-        <div class="min-w-0">
-          <p class="text-sm font-medium text-white truncate">${escapeHtml(s.name || s.UUID)}</p>
-          ${s.description ? `<p class="text-xs text-neutral-500 mt-0.5 truncate">${escapeHtml(s.description)}</p>` : ''}
-          ${disabled ? '<p class="text-xs text-amber-500 mt-1">Unavailable</p>' : ''}
-        </div>
-        ${!disabled ? '<svg class="w-4 h-4 text-neutral-600 flex-shrink-0 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>' : ''}
-      </div>`;
+    return `<div onclick="${disabled ? '' : `selectServer('${s.UUID}','${action}')`}"
+      class="flex items-center justify-between px-4 py-3 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg ${disabled ? 'opacity-40 cursor-not-allowed' : 'hover:border-neutral-300 dark:hover:border-neutral-700 cursor-pointer'} transition-colors">
+      <div class="min-w-0">
+        <p class="text-sm font-medium text-neutral-900 dark:text-white truncate">${escapeHtml(s.name || s.UUID)}</p>
+        ${s.description ? `<p class="text-xs text-neutral-500 mt-0.5 truncate">${escapeHtml(s.description)}</p>` : ''}
+        ${disabled ? '<p class="text-xs text-amber-500 mt-0.5">Suspended</p>' : ''}
+      </div>
+      ${!disabled ? '<svg class="w-4 h-4 text-neutral-400 flex-shrink-0 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>' : ''}
+    </div>`;
   }).join('');
 }
 
 function selectServer(uuid, action) {
-  hideModal('serverSelectorModal');
-  currentServerUUID = uuid;
+  hideModal('serverSelectorModal'); currentServerUUID = uuid;
   if (action === 'create') {
     showModal('createBackupModal');
   } else {
@@ -295,9 +253,7 @@ function selectServer(uuid, action) {
   }
 }
 
-// ─── Disconnect ───────────────────────────────────────────────────
-
-async function disconnectGoogle() {
+async function disconnectProvider() {
   if (!confirm('Disconnect from Google Drive? Your backups will remain in Drive.')) return;
   try {
     const { success } = await fetch('/parachute/api/disconnect', { method: 'POST' }).then(r => r.json());
@@ -306,13 +262,10 @@ async function disconnectGoogle() {
   } catch { showToast('Failed to disconnect', 'error'); }
 }
 
-// ─── Filter / sort ────────────────────────────────────────────────
-
 function filterBackups() {
   const q = document.getElementById('backupSearch').value.toLowerCase();
-  document.querySelectorAll('.backup-item').forEach(el => {
-    const name = el.querySelector('span')?.textContent?.toLowerCase() ?? '';
-    el.style.display = name.includes(q) ? '' : 'none';
+  document.querySelectorAll('.backup-row').forEach(el => {
+    el.style.display = (el.querySelector('.text-sm')?.textContent?.toLowerCase() ?? '').includes(q) ? '' : 'none';
   });
 }
 
@@ -330,25 +283,20 @@ function sortBackups() {
   renderBackups(sorted);
 }
 
-// ─── Progress modal ───────────────────────────────────────────────
-
-const BACKUP_STEPS = ['Creating backup on daemon','Downloading from daemon','Encrypting','Uploading to Drive','Cleaning up daemon','Saving to database'];
-const RESTORE_STEPS = ['Downloading from Drive','Decrypting','Restoring on daemon'];
-
-const BACKUP_MAP = {1:{pct:10,msg:'Creating backup on daemon…'},2:{pct:30,msg:'Downloading from daemon…'},3:{pct:50,msg:'Encrypting backup…'},4:{pct:70,msg:'Uploading to Google Drive…'},5:{pct:90,msg:'Cleaning up daemon…'},6:{pct:100,msg:'Saving to database…'}};
-const RESTORE_MAP = {7:{pct:33,msg:'Downloading from Drive…'},8:{pct:67,msg:'Decrypting backup…'},9:{pct:100,msg:'Restoring on daemon…'}};
-
+const BACKUP_STEPS = ['Creating backup on daemon','Downloading from daemon','Encrypting','Uploading to storage','Cleaning up','Saving record'];
+const RESTORE_STEPS = ['Downloading from storage','Decrypting','Restoring on daemon'];
+const BACKUP_MAP = {1:{pct:10,msg:'Creating backup on daemon…'},2:{pct:30,msg:'Downloading from daemon…'},3:{pct:50,msg:'Encrypting backup…'},4:{pct:70,msg:'Uploading to storage…'},5:{pct:90,msg:'Cleaning up daemon…'},6:{pct:100,msg:'Saving record…'}};
+const RESTORE_MAP = {7:{pct:33,msg:'Downloading from storage…'},8:{pct:67,msg:'Decrypting backup…'},9:{pct:100,msg:'Restoring on daemon…'}};
 let pollTimer = null;
 
 function renderSteps(steps, activeIdx) {
   return steps.map((label, i) => {
-    const done = i < activeIdx;
-    const active = i === activeIdx;
+    const done = i < activeIdx, active = i === activeIdx;
     return `<div class="flex items-center gap-2.5">
-      <div class="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${done ? 'bg-emerald-500' : active ? 'border-2 border-emerald-400' : 'border-2 border-neutral-700'}">
-        ${done ? '<svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>' : active ? '<div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>' : ''}
+      <div class="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${done ? 'bg-emerald-500' : active ? 'border-2 border-emerald-500' : 'border-2 border-neutral-300 dark:border-neutral-700'}">
+        ${done ? '<svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>' : active ? '<div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>' : ''}
       </div>
-      <span class="text-xs ${done ? 'text-neutral-500 line-through' : active ? 'text-white font-medium' : 'text-neutral-600'}">${label}</span>
+      <span class="text-xs ${done ? 'text-neutral-400 line-through' : active ? 'text-neutral-900 dark:text-white font-medium' : 'text-neutral-400 dark:text-neutral-600'}">${label}</span>
     </div>`;
   }).join('');
 }
@@ -356,65 +304,41 @@ function renderSteps(steps, activeIdx) {
 async function fetchProgress() {
   try {
     const { step } = await fetch('/parachute/api/progress', { cache: 'no-store' }).then(r => r.json());
-    const empty = document.getElementById('progressEmpty');
-    const active = document.getElementById('progressActive');
-
-    if (!step) {
-      empty.classList.remove('hidden'); active.classList.add('hidden'); return;
-    }
-
-    const isRestore = step >= 7;
-    const map = isRestore ? RESTORE_MAP : BACKUP_MAP;
+    const empty = document.getElementById('progressEmpty'), active = document.getElementById('progressActive');
+    if (!step) { empty.classList.remove('hidden'); active.classList.add('hidden'); return; }
+    const isRestore = step >= 7, map = isRestore ? RESTORE_MAP : BACKUP_MAP;
     const info = map[step] || { pct: 0, msg: 'Processing…' };
     const steps = isRestore ? RESTORE_STEPS : BACKUP_STEPS;
     const idx = isRestore ? step - 7 : step - 1;
-
     empty.classList.add('hidden'); active.classList.remove('hidden');
     document.getElementById('progressBar').style.width = `${info.pct}%`;
     document.getElementById('progressMsg').textContent = info.msg;
     document.getElementById('progressPct').textContent = `${info.pct}%`;
     document.getElementById('stepsList').innerHTML = renderSteps(steps, idx);
-
-    if (info.pct >= 100) {
-      clearInterval(pollTimer); pollTimer = null;
-      setTimeout(() => { closeProgressModal(); loadBackups(); }, 1500);
-    }
+    if (info.pct >= 100) { clearInterval(pollTimer); pollTimer = null; setTimeout(() => { closeProgressModal(); loadBackups(); }, 1500); }
   } catch { /* non-fatal */ }
 }
 
 function openProgressModal() {
   document.getElementById('progressModal').classList.remove('hidden');
-  fetchProgress();
-  if (!pollTimer) pollTimer = setInterval(fetchProgress, 5000);
+  fetchProgress(); if (!pollTimer) pollTimer = setInterval(fetchProgress, 5000);
 }
-
-function closeProgressModal() {
-  clearInterval(pollTimer); pollTimer = null;
-  document.getElementById('progressModal').classList.add('hidden');
-}
-
+function closeProgressModal() { clearInterval(pollTimer); pollTimer = null; document.getElementById('progressModal').classList.add('hidden'); }
 window.openProgressModal = openProgressModal;
 window.closeProgressModal = closeProgressModal;
 
-// ─── Init ─────────────────────────────────────────────────────────
-
 document.addEventListener('DOMContentLoaded', () => {
-  updateAuthStatus();
-  loadBackups();
-
+  updateAuthStatus(); loadBackups();
   const params = new URLSearchParams(location.search);
-  if (params.get('success') === 'connected') {
-    showToast('Connected to Google Drive', 'success');
-    history.replaceState({}, '', '/parachute');
-  } else if (params.get('error')) {
-    showToast('Connection failed — check your credentials', 'error');
-    history.replaceState({}, '', '/parachute');
+  if (params.get('success') === 'connected') { showToast('Connected to Google Drive', 'success'); history.replaceState({}, '', '/parachute'); }
+  else if (params.get('error')) {
+    const msgs = { oauth_init_failed: 'OAuth setup failed — check admin config', oauth_failed: 'Connection failed', invalid_state: 'Invalid OAuth state — try again' };
+    showToast(msgs[params.get('error')] || 'Connection failed', 'error'); history.replaceState({}, '', '/parachute');
   }
 });
 </script>
 
 <%- include(components.footer) %>
-
 <style>
 *, html, body { scrollbar-width: none; -ms-overflow-style: none; }
 ::-webkit-scrollbar { display: none; }

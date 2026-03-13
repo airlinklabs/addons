@@ -46,6 +46,14 @@
     {
       "name": "create_parachute_backups_index",
       "sql": "CREATE INDEX IF NOT EXISTS idx_parachute_backups_user ON Parachute_Backups(userId)"
+    },
+    {
+      "name": "add_parachute_backups_provider_column",
+      "sql": "ALTER TABLE Parachute_Backups ADD COLUMN provider TEXT NOT NULL DEFAULT 'google_drive'"
+    },
+    {
+      "name": "create_parachute_config_table",
+      "sql": "CREATE TABLE IF NOT EXISTS Parachute_Config (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, key TEXT NOT NULL, value TEXT NOT NULL, updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, UNIQUE(key))"
     }
   ]
 }

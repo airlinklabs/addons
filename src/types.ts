@@ -107,6 +107,7 @@ export interface ParachuteBackup {
   encrypted: number;
   passwordHint: string | null;
   fileSize: number | null;
+  provider: string;
   createdAt: Date;
 }
 
@@ -116,6 +117,7 @@ export interface AuthStatus {
   displayName?: string;
   pictureUrl?: string;
   folderName?: string;
+  provider?: string;
 }
 
 export interface BackupResult {

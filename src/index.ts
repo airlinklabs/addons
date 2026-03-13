@@ -4,7 +4,7 @@ import { AddonAPI, getProgress } from './types';
 import { setupUI, isMobile, resolveView, getComponents } from './ui';
 import { handleOAuthConnect, handleOAuthCallback, getAuthStatus, disconnectGoogle } from './handlers/oauth';
 import { listBackups, createBackup, restoreBackup, deleteBackup, renameBackup, listUserServers } from './handlers/files';
-import { validateConfig } from './handlers/config';
+import { initSettings } from './settingsManager';
 
 function requireAuth(req: Request, res: Response): boolean {
   if (!req.session?.user) {
@@ -14,13 +14,19 @@ function requireAuth(req: Request, res: Response): boolean {
   return true;
 }
 
+function requireAdmin(req: Request, res: Response): boolean {
+  if (!req.session?.user?.isAdmin) {
+    res.status(403).json({ success: false, error: 'Admin access required' });
+    return false;
+  }
+  return true;
+}
+
 export default async function(router: Router, api: AddonAPI): Promise<void> {
   const { logger, prisma } = api;
 
-  const config = validateConfig();
-  if (!config.valid) {
-    logger.error(`Parachute: missing env vars: ${config.missing.join(', ')}`);
-  }
+  const settingsMgr = await initSettings(prisma);
+  logger.info('Parachute settings loaded from database');
 
   setupUI(api);
 
@@ -28,30 +34,33 @@ export default async function(router: Router, api: AddonAPI): Promise<void> {
     try {
       if (!req.session?.user) { res.redirect('/login?redirect=/parachute'); return; }
 
-      const [status, settings] = await Promise.all([
-        getAuthStatus(req.session.user.id, prisma, logger),
+      const [status, settings, dbSettings] = await Promise.all([
+        getAuthStatus(req.session.user.id, prisma, logger, settingsMgr),
+        settingsMgr.loadAsync(),
         prisma.settings.findUnique({ where: { id: 1 } }),
       ]);
 
       const mobile = isMobile(req);
       const viewPath = resolveView(api, 'parachute.ejs', mobile);
       const components = getComponents(api, req);
+      const viewDir = mobile ? api.mobileViewsPath : api.desktopViewsPath;
 
       res.render(viewPath, {
         title: 'Parachute',
         user: req.session.user,
         req,
-        settings,
+        settings: dbSettings,
         status,
+        parachuteSettings: settings,
         components: {
           ...components,
-          google: path.join(mobile ? api.mobileViewsPath : api.desktopViewsPath, 'google.ejs'),
-          fileList: path.join(mobile ? api.mobileViewsPath : api.desktopViewsPath, 'file.ejs'),
-          serverSelector: path.join(mobile ? api.mobileViewsPath : api.desktopViewsPath, 'server-selector.ejs'),
-          createBackupModal: path.join(mobile ? api.mobileViewsPath : api.desktopViewsPath, 'create-backup-modal.ejs'),
-          restoreBackupModal: path.join(mobile ? api.mobileViewsPath : api.desktopViewsPath, 'restore-backup-modal.ejs'),
-          renameBackupModal: path.join(mobile ? api.mobileViewsPath : api.desktopViewsPath, 'rename-backup-modal.ejs'),
-          deleteConfirmModal: path.join(mobile ? api.mobileViewsPath : api.desktopViewsPath, 'delete-confirm-modal.ejs'),
+          providerPanel: path.join(viewDir, 'provider-panel.ejs'),
+          fileList: path.join(viewDir, 'file.ejs'),
+          serverSelector: path.join(viewDir, 'server-selector.ejs'),
+          createBackupModal: path.join(viewDir, 'create-backup-modal.ejs'),
+          restoreBackupModal: path.join(viewDir, 'restore-backup-modal.ejs'),
+          renameBackupModal: path.join(viewDir, 'rename-backup-modal.ejs'),
+          deleteConfirmModal: path.join(viewDir, 'delete-confirm-modal.ejs'),
           toast: path.join(api.viewsPath, 'toast.ejs'),
         },
       });
@@ -61,19 +70,101 @@ export default async function(router: Router, api: AddonAPI): Promise<void> {
     }
   });
 
-  router.get('/oauth/google/connect', (req: Request, res: Response) => {
+  router.get('/admin', async (req: Request, res: Response): Promise<void> => {
+    try {
+      if (!req.session?.user) { res.redirect('/login?redirect=/parachute/admin'); return; }
+      if (!req.session.user.isAdmin) { res.redirect('/parachute'); return; }
+
+      const [parachuteSettings, dbSettings] = await Promise.all([
+        settingsMgr.loadAsync(),
+        prisma.settings.findUnique({ where: { id: 1 } }),
+      ]);
+
+      const mobile = isMobile(req);
+      const viewPath = resolveView(api, 'admin-config.ejs', mobile);
+      const components = getComponents(api, req);
+
+      res.render(viewPath, {
+        title: 'Parachute — Admin',
+        user: req.session.user,
+        req,
+        settings: dbSettings,
+        parachuteSettings,
+        components,
+      });
+    } catch (err) {
+      logger.error('Admin render error:', err);
+      res.status(500).send('Failed to load admin config');
+    }
+  });
+
+  router.get('/api/admin/settings', async (req: Request, res: Response): Promise<void> => {
+    if (!requireAuth(req, res)) return;
+    if (!requireAdmin(req, res)) return;
+    try {
+      const settings = await settingsMgr.loadAsync();
+      const sanitized = JSON.parse(JSON.stringify(settings));
+      for (const key of Object.keys(sanitized.providers) as (keyof typeof sanitized.providers)[]) {
+        const p = sanitized.providers[key];
+        if ('password' in p && p.password) p.password = '••••••••';
+        if ('secretAccessKey' in p && p.secretAccessKey) p.secretAccessKey = '••••••••';
+        if ('appSecret' in p && p.appSecret) p.appSecret = '••••••••';
+        if ('clientSecret' in p && p.clientSecret) p.clientSecret = '••••••••';
+      }
+      if (sanitized.cookieSecret) sanitized.cookieSecret = '••••••••';
+      res.json({ success: true, data: sanitized });
+    } catch (err) {
+      logger.error('Admin get settings error:', err);
+      res.status(500).json({ success: false, error: 'Failed to load settings' });
+    }
+  });
+
+  router.post('/api/admin/settings', async (req: Request, res: Response): Promise<void> => {
+    if (!requireAuth(req, res)) return;
+    if (!requireAdmin(req, res)) return;
+    try {
+      const current = await settingsMgr.loadAsync();
+      const body = req.body;
+
+      if (body.appUrl !== undefined) current.appUrl = body.appUrl;
+      if (body.cookieSecret && body.cookieSecret !== '••••••••') current.cookieSecret = body.cookieSecret;
+
+      if (body.providers) {
+        const providerMap = current.providers as Record<string, unknown>;
+        for (const key of Object.keys(body.providers as Record<string, unknown>)) {
+          const incoming = (body.providers as Record<string, unknown>)[key] as Record<string, unknown>;
+          const existing = (providerMap[key] ?? {}) as Record<string, unknown>;
+          const merged: Record<string, unknown> = { ...existing, ...incoming };
+          for (const secretField of ['password', 'secretAccessKey', 'appSecret', 'clientSecret']) {
+            if (merged[secretField] === '••••••••') merged[secretField] = existing[secretField] ?? '';
+          }
+          providerMap[key] = merged;
+        }
+      }
+
+      await settingsMgr.save(current);
+      logger.info(`Admin ${req.session!.user!.id} saved Parachute settings`);
+      res.json({ success: true });
+    } catch (err) {
+      logger.error('Admin save settings error:', err);
+      res.status(500).json({ success: false, error: 'Failed to save settings' });
+    }
+  });
+
+  router.get('/oauth/google/connect', async (req: Request, res: Response) => {
     if (!req.session?.user) { res.redirect('/login?redirect=/parachute'); return; }
-    handleOAuthConnect(req, res, logger);
+    const settings = await settingsMgr.loadAsync();
+    handleOAuthConnect(req, res, logger, settings);
   });
 
   router.get('/oauth/google/callback', (req: Request, res: Response) =>
-    handleOAuthCallback(req, res, prisma, logger)
+    handleOAuthCallback(req, res, prisma, logger, settingsMgr)
   );
 
   router.get('/api/status', async (req: Request, res: Response): Promise<void> => {
     if (!requireAuth(req, res)) return;
     try {
-      const status = await getAuthStatus(req.session!.user!.id, prisma, logger);
+      const status = await getAuthStatus(req.session!.user!.id, prisma, logger, settingsMgr);
       res.json({ success: true, data: status });
     } catch (err) {
       logger.error('Status error:', err);
@@ -127,7 +218,7 @@ export default async function(router: Router, api: AddonAPI): Promise<void> {
       if (name.length > 100) { res.status(400).json({ success: false, error: 'Name too long (max 100 characters)' }); return; }
       if (passwordHint?.length > 200) { res.status(400).json({ success: false, error: 'Hint too long (max 200 characters)' }); return; }
 
-      const result = await createBackup(req.session!.user!.id, serverUUID, name, password, passwordHint, prisma, logger);
+      const result = await createBackup(req.session!.user!.id, serverUUID, name, password, passwordHint, prisma, logger, settingsMgr);
       result.success
         ? res.json({ success: true, data: result.data })
         : res.status(500).json({ success: false, error: result.error });
@@ -145,7 +236,7 @@ export default async function(router: Router, api: AddonAPI): Promise<void> {
       if (isNaN(backupId)) { res.status(400).json({ success: false, error: 'Invalid backup ID' }); return; }
       if (!serverUUID) { res.status(400).json({ success: false, error: 'Server UUID required' }); return; }
 
-      const result = await restoreBackup(req.session!.user!.id, backupId, serverUUID, password, prisma, logger);
+      const result = await restoreBackup(req.session!.user!.id, backupId, serverUUID, password, prisma, logger, settingsMgr);
       result.success
         ? res.json({ success: true })
         : res.status(500).json({ success: false, error: result.error });
@@ -161,7 +252,7 @@ export default async function(router: Router, api: AddonAPI): Promise<void> {
       const backupId = parseInt(req.params.id, 10);
       if (isNaN(backupId)) { res.status(400).json({ success: false, error: 'Invalid backup ID' }); return; }
 
-      const result = await deleteBackup(req.session!.user!.id, backupId, prisma, logger);
+      const result = await deleteBackup(req.session!.user!.id, backupId, prisma, logger, settingsMgr);
       result.success
         ? res.json({ success: true })
         : res.status(500).json({ success: false, error: result.error });

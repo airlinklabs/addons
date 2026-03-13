@@ -1,25 +1,23 @@
-<div id="serverSelectorModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-  <div class="bg-[#111] border border-neutral-800 rounded-xl w-full max-w-lg max-h-[80vh] flex flex-col">
-    <div class="flex items-start justify-between px-5 py-4 border-b border-neutral-800 flex-shrink-0">
+<div id="serverSelectorModal" class="hidden fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+  <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl w-full max-w-lg max-h-[80vh] flex flex-col shadow-2xl">
+    <div class="flex items-start justify-between px-5 py-4 border-b border-neutral-200 dark:border-neutral-800 flex-shrink-0">
       <div>
-        <h2 class="text-sm font-semibold text-white" id="serverSelectorTitle">Select server</h2>
+        <h2 class="text-sm font-semibold text-neutral-900 dark:text-white" id="serverSelectorTitle">Select server</h2>
         <p class="text-xs text-neutral-500 mt-0.5" id="serverSelectorDesc">Choose a server</p>
       </div>
-      <button onclick="hideModal('serverSelectorModal')" class="text-neutral-600 hover:text-white transition-colors mt-0.5">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <button onclick="hideModal('serverSelectorModal')" class="text-neutral-400 hover:text-neutral-700 dark:hover:text-white transition-colors mt-0.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
         </svg>
       </button>
     </div>
-
-    <div class="px-5 py-3 border-b border-neutral-800 flex-shrink-0">
+    <div class="px-5 py-3 border-b border-neutral-200 dark:border-neutral-800 flex-shrink-0">
       <input type="text" id="serverSearch" placeholder="Search servers…" onkeyup="filterServers()"
-        class="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-neutral-600 transition-colors">
+        class="w-full px-3 py-2 bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-xs text-neutral-900 dark:text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors">
     </div>
-
-    <div class="p-4 overflow-y-auto flex-1 space-y-2" id="serversList">
+    <div class="p-4 overflow-y-auto flex-1 space-y-2 no-scrollbar" id="serversList">
       <div class="flex items-center justify-center py-8">
-        <div class="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+        <div class="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     </div>
   </div>
@@ -28,7 +26,7 @@
 <script>
 function filterServers() {
   const q = document.getElementById('serverSearch').value.toLowerCase();
-  document.querySelectorAll('#serversList > div[onclick]').forEach(el => {
+  document.querySelectorAll('#serversList > div').forEach(el => {
     const name = el.querySelector('p')?.textContent?.toLowerCase() ?? '';
     el.style.display = name.includes(q) ? '' : 'none';
   });
