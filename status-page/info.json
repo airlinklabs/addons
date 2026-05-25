@@ -1,0 +1,21 @@
+{
+  "name": "Status Page",
+  "version": "1.0.0",
+  "description": "Adds a gorgeous system status page with real-time node monitoring and incident logs.",
+  "longDescription": "Keep your users informed! The Status Page addon adds a /status route to your panel. It automatically pings each configured node daemon to show live Online/Offline status and allows administrators to easily post maintenance updates or incident logs directly from the UI.",
+  "author": "sayamcoder",
+  "status": "working",
+  "tags": ["Utility", "Status", "Public", "Monitor"],
+  "icon": "https://img.icons8.com/color/512/activity-history.png",
+  "iconType": "url",
+  "features": [
+    "Dynamic pulsing Online/Offline node indicators via TCP daemon pings",
+    "Automatic calculations of Partial or Major Outages with stylized warning banners",
+    "Modern incident logger with severity flags (Resolved, Investigating, Maintenance, etc.)",
+    "Seamless dark mode integration using RyzenNodes neutral palette design",
+    "Dynamic sidebar menu entry natively auto-registered"
+  ],
+  "github": "https://github.com/sayamcoder/airlink-status-page",
+  "screenshots": [],
+  "installNote": "Restart the panel daemon after installation for database migrations and sidebar items to load."
+}
