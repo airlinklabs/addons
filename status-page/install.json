@@ -1,0 +1,26 @@
+{
+  "note": "Ensure your panel version supports the UI addSidebarItem API.",
+  "steps": [
+    {
+      "title": "Clone the addon",
+      "commands": [
+        "cd /var/www/panel/storage/addons/",
+        "git clone https://github.com/sayamcoder/airlink-status-page.git status-page"
+      ]
+    },
+    {
+      "title": "Install dependencies",
+      "commands": [
+        "cd /var/www/panel/storage/addons/status-page",
+        "npm install",
+        "npm run build"
+      ]
+    },
+    {
+      "title": "Restart AirLink panel",
+      "commands": [
+        "systemctl restart airlink-panel"
+      ]
+    }
+  ]
+}
